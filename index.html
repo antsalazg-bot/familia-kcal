@@ -39,28 +39,28 @@
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 16px; -webkit-text-size-adjust: 100%; }
 body { overflow: hidden; }
 
-/* ── SCREENS ── */
+/* ââ SCREENS ââ */
 .screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s ease, opacity 0.3s ease; }
 .screen.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
 .screen.slide-out { transform: translateX(-40%); opacity: 0; pointer-events: none; }
 
-/* ── HEADER ── */
+/* ââ HEADER ââ */
 .header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; background: var(--surface); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
 .header h1 { font-size: 17px; font-weight: 600; flex: 1; }
 .header .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--green-light); padding: 0 4px; line-height: 1; }
 .header .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 4px; }
 
-/* ── SCROLLABLE CONTENT ── */
+/* ââ SCROLLABLE CONTENT ââ */
 .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 20px calc(var(--safe-bottom) + 90px); }
 
-/* ── BOTTOM NAV ── */
+/* ââ BOTTOM NAV ââ */
 .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; padding: 0 0 var(--safe-bottom); }
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 6px; background: none; border: none; cursor: pointer; color: var(--hint); transition: color 0.2s; }
 .nav-btn.active { color: var(--green-light); }
 .nav-btn svg { width: 22px; height: 22px; }
 .nav-btn span { font-size: 10px; font-weight: 500; font-family: inherit; }
 
-/* ── HOME SCREEN ── */
+/* ââ HOME SCREEN ââ */
 .home-logo { text-align: center; padding: 32px 0 24px; }
 .home-logo .logo-ring { width: 72px; height: 72px; border-radius: 50%; background: var(--green); display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 12px; }
 .home-logo h2 { font-size: 22px; font-weight: 600; }
@@ -75,7 +75,7 @@ body { overflow: hidden; }
 .add-member-card span { font-size: 32px; line-height: 1; }
 .add-member-card p { font-size: 13px; font-weight: 500; }
 
-/* ── METRIC CARDS ── */
+/* ââ METRIC CARDS ââ */
 .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
 .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; }
 .metric .val { font-size: 20px; font-weight: 600; line-height: 1.1; }
@@ -84,23 +84,32 @@ body { overflow: hidden; }
 .metric.amber .val { color: var(--amber); }
 .metric.red .val { color: var(--red); }
 
-/* ── PROGRESS BAR ── */
+/* ââ PROGRESS BAR ââ */
 .prog-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
 .prog-bar { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; margin: 8px 0 6px; }
 .prog-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.3s; }
 .prog-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 
-/* ── LOG FORM ── */
+/* ââ LOG FORM ââ */
 .log-form { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
 .form-row { display: flex; gap: 8px; margin-bottom: 10px; }
 .form-field { display: flex; flex-direction: column; gap: 5px; }
 .form-field label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
 .form-field input, .form-field select { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 15px; font-family: inherit; color: var(--text); -webkit-appearance: none; outline: none; }
 .form-field input:focus, .form-field select:focus { border-color: var(--green-light); }
+.ac-wrap { position: relative; }
+.ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); z-index: 200; max-height: 220px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.ac-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; border-bottom: 0.5px solid var(--border); gap: 8px; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:active { background: var(--bg); }
+.ac-item .ac-name { font-size: 14px; flex: 1; }
+.ac-item .ac-portion { font-size: 12px; color: var(--hint); }
+.ac-item .ac-kcal { font-size: 14px; font-weight: 600; color: var(--green-light); white-space: nowrap; }
+.ac-empty { padding: 12px 14px; font-size: 13px; color: var(--hint); text-align: center; }
 .btn-primary { background: var(--green); color: #fff; border: none; border-radius: var(--radius-sm); padding: 12px 20px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; width: 100%; transition: opacity 0.15s; }
 .btn-primary:active { opacity: 0.85; }
 
-/* ── MEAL GROUPS ── */
+/* ââ MEAL GROUPS ââ */
 .meal-section { margin-bottom: 14px; }
 .meal-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .meal-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -114,19 +123,19 @@ body { overflow: hidden; }
 .del-btn:active { color: var(--red); }
 .empty-state { text-align: center; padding: 32px 20px; color: var(--hint); font-size: 14px; line-height: 1.6; }
 
-/* ── DATE NAV ── */
+/* ââ DATE NAV ââ */
 .date-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 .date-nav .nav-arrow { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 18px; cursor: pointer; color: var(--text); }
 .date-nav .date-label { flex: 1; text-align: center; font-size: 15px; font-weight: 600; }
 
-/* ── BARS ── */
+/* ââ BARS ââ */
 .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .bar-row .bl { font-size: 13px; color: var(--muted); min-width: 72px; }
 .bar-track { flex: 1; height: 22px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .bar-fill { height: 100%; border-radius: var(--radius-sm); transition: width 0.4s ease; }
 .bar-row .bv { font-size: 13px; font-weight: 600; min-width: 60px; text-align: right; }
 
-/* ── WEEK GRID ── */
+/* ââ WEEK GRID ââ */
 .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
 .wday { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .wday.today { border-color: var(--green-light); border-width: 1.5px; }
@@ -135,13 +144,13 @@ body { overflow: hidden; }
 .wday .wd-fill { width: 100%; border-radius: 4px; transition: height 0.4s ease; }
 .wday .wd-val { font-size: 9px; font-weight: 600; color: var(--muted); }
 
-/* ── MONTH WEEK ROWS ── */
+/* ââ MONTH WEEK ROWS ââ */
 .mweek-row { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; margin-bottom: 8px; }
 .mweek-row .mw-label { flex: 1; font-size: 14px; }
 .mweek-row .mw-sub { font-size: 12px; color: var(--muted); }
 .mweek-row .mw-val { font-size: 15px; font-weight: 600; margin-left: 12px; }
 
-/* ── PROFILE SCREEN ── */
+/* ââ PROFILE SCREEN ââ */
 .settings-section { margin-bottom: 24px; }
 .settings-section h3 { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
 .settings-row { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -156,15 +165,15 @@ body { overflow: hidden; }
 .emoji-opt.selected { border-color: var(--green-light); }
 .btn-danger { background: none; border: 1px solid var(--red); color: var(--red); border-radius: var(--radius-sm); padding: 12px 20px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; width: 100%; }
 
-/* ── NEW MEMBER FORM ── */
+/* ââ NEW MEMBER FORM ââ */
 .new-member-screen { }
 .big-avatar { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; margin: 0 auto 24px; }
 
-/* ── TOAST ── */
+/* ââ TOAST ââ */
 .toast { position: fixed; bottom: calc(var(--safe-bottom) + 80px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── SECTION LABEL ── */
+/* ââ SECTION LABEL ââ */
 .section-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; margin-top: 20px; }
 .card-block { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
 </style>
@@ -174,7 +183,7 @@ body { overflow: hidden; }
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════════════════════════════════ HOME SCREEN -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââ HOME SCREEN -->
 <div class="screen" id="screen-home">
   <div class="header" style="border-bottom:none;background:transparent">
     <h1>Familia Kcal</h1>
@@ -184,7 +193,7 @@ body { overflow: hidden; }
   </div>
   <div class="content" style="padding-bottom:20px">
     <div class="home-logo">
-      <div class="logo-ring">🥦</div>
+      <div class="logo-ring">ð¥¦</div>
       <h2>Familia Kcal</h2>
       <p>Selecciona tu perfil</p>
     </div>
@@ -192,14 +201,14 @@ body { overflow: hidden; }
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ NEW MEMBER SCREEN -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââ NEW MEMBER SCREEN -->
 <div class="screen hidden" id="screen-new-member">
   <div class="header">
-    <button class="back-btn" onclick="showHome()">‹</button>
+    <button class="back-btn" onclick="showHome()">â¹</button>
     <h1 id="nm-title">Nuevo integrante</h1>
   </div>
   <div class="content">
-    <div class="big-avatar" id="nm-preview">😊</div>
+    <div class="big-avatar" id="nm-preview">ð</div>
 
     <div class="settings-section">
       <h3>Emoji</h3>
@@ -221,10 +230,10 @@ body { overflow: hidden; }
     </div>
 
     <div class="settings-section">
-      <h3>Meta diaria de calorías</h3>
+      <h3>Meta diaria de calorÃ­as</h3>
       <div class="card-block" style="padding:0">
         <div class="settings-row">
-          <span class="sr-label">kcal / día</span>
+          <span class="sr-label">kcal / dÃ­a</span>
           <input type="number" id="nm-goal" value="2000" min="500" max="5000">
         </div>
       </div>
@@ -234,10 +243,10 @@ body { overflow: hidden; }
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TRACKER SCREEN -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââ TRACKER SCREEN -->
 <div class="screen hidden" id="screen-tracker">
   <div class="header">
-    <button class="back-btn" onclick="goHome()">‹</button>
+    <button class="back-btn" onclick="goHome()">â¹</button>
     <div id="tracker-avatar" class="avatar" style="width:32px;height:32px;font-size:16px"></div>
     <h1 id="tracker-name" style="font-size:16px"></h1>
     <button class="icon-btn" onclick="showProfileSettings()" title="Ajustes">
@@ -267,10 +276,10 @@ body { overflow: hidden; }
   </nav>
 </div>
 
-<!-- ═══════════════════════════════════════════ PROFILE SETTINGS SCREEN -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââ PROFILE SETTINGS SCREEN -->
 <div class="screen hidden" id="screen-profile">
   <div class="header">
-    <button class="back-btn" onclick="backToTracker()">‹</button>
+    <button class="back-btn" onclick="backToTracker()">â¹</button>
     <h1>Perfil</h1>
   </div>
   <div class="content">
@@ -279,9 +288,9 @@ body { overflow: hidden; }
 </div>
 
 <script>
-/* ═══ DATA ═══ */
+/* âââ DATA âââ */
 const COLORS = ['#0F6E56','#534AB7','#D85A30','#185FA5','#A32D2D','#3B6D11','#BA7517','#993556'];
-const EMOJIS = ['😊','💪','🧑','👩','👦','👧','🧔','👴','👵','🍎','🥗','🏃','🧘','⚡','🌟','🦸'];
+const EMOJIS = ['ð','ðª','ð§','ð©','ð¦','ð§','ð§','ð´','ðµ','ð','ð¥','ð','ð§','â¡','ð','ð¦¸'];
 const MEAL_COLORS = {desayuno:'#378ADD',lunch:'#1D9E75',comida:'#EF9F27',cena:'#534AB7',snack:'#D85A30'};
 const MEAL_NAMES = {desayuno:'Desayuno',lunch:'Lunch',comida:'Comida',cena:'Cena',snack:'Snack'};
 const MEAL_ORDER = ['desayuno','lunch','comida','cena','snack'];
@@ -294,7 +303,7 @@ let viewWeekOff = 0;
 let viewMonthOff = 0;
 let editingMemberId = null;
 
-/* ═══ UTILS ═══ */
+/* âââ UTILS âââ */
 function todayKey() {
   const d = new Date();
   return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -317,14 +326,14 @@ function toast(msg){
   setTimeout(()=>el.classList.remove('show'), 2200);
 }
 
-/* ═══ STORAGE ═══ */
+/* âââ STORAGE âââ */
 function saveMembers(){ localStorage.setItem('fk-members', JSON.stringify(members)); }
 function loadMembers(){ try{ members = JSON.parse(localStorage.getItem('fk-members'))||[]; }catch(e){ members=[]; } }
 function getMemberLog(mid){ try{ return JSON.parse(localStorage.getItem('fk-log-'+mid))||{}; }catch(e){ return {}; } }
 function saveMemberLog(mid, log){ localStorage.setItem('fk-log-'+mid, JSON.stringify(log)); }
 function dayTotal(mid, k){ return (getMemberLog(mid)[k]||[]).reduce((s,e)=>s+e.cal,0); }
 
-/* ═══ SCREEN TRANSITIONS ═══ */
+/* âââ SCREEN TRANSITIONS âââ */
 function showScreen(id, from){
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('slide-out'); s.classList.add('hidden'); });
   document.getElementById(id).classList.remove('hidden');
@@ -333,7 +342,7 @@ function showHome(){ showScreen('screen-home'); renderHome(); }
 function goHome(){ currentMember = null; viewDay = todayKey(); viewWeekOff = 0; viewMonthOff = 0; showHome(); }
 function backToTracker(){ showScreen('screen-tracker'); }
 
-/* ═══ HOME ═══ */
+/* âââ HOME âââ */
 function renderHome(){
   const grid = document.getElementById('member-grid');
   let html = '';
@@ -371,13 +380,13 @@ function updateTrackerHeader(){
   av.style.background = currentMember.color+'20';
 }
 
-/* ═══ NEW / EDIT MEMBER ═══ */
-let nmEmoji = '😊', nmColor = COLORS[0];
+/* âââ NEW / EDIT MEMBER âââ */
+let nmEmoji = 'ð', nmColor = COLORS[0];
 
 function showNewMember(memberId){
   editingMemberId = memberId || null;
   const m = memberId ? members.find(x=>x.id===memberId) : null;
-  nmEmoji = m ? m.emoji : '😊';
+  nmEmoji = m ? m.emoji : 'ð';
   nmColor = m ? m.color : COLORS[0];
 
   document.getElementById('nm-title').textContent = m ? 'Editar perfil' : 'Nuevo integrante';
@@ -436,7 +445,7 @@ function saveMember(){
   }
 }
 
-/* ═══ TRACKER TABS ═══ */
+/* âââ TRACKER TABS âââ */
 function switchTab(tab){
   currentTab = tab;
   ['hoy','semana','mes'].forEach(t=>{
@@ -451,7 +460,7 @@ function renderTab(){
   else renderMes();
 }
 
-/* ═══ HOY ═══ */
+/* âââ HOY âââ */
 function renderHoy(){
   const log = getMemberLog(currentMember.id);
   const entries = log[viewDay]||[];
@@ -482,18 +491,18 @@ function renderHoy(){
         <span class="en-name">${e.food}</span>
         <span class="en-time">${e.time||''}</span>
         <span class="en-cal">${e.cal.toLocaleString()} kcal</span>
-        <button class="del-btn" onclick="deleteEntry('${viewDay}',${e.id})">×</button>
+        <button class="del-btn" onclick="deleteEntry('${viewDay}',${e.id})">Ã</button>
       </div>`;
     });
     entriesHtml += `</div>`;
   });
-  if(!entries.length) entriesHtml = `<div class="empty-state">Sin registros para este día.<br>Agrega tu primer alimento abajo ↓</div>`;
+  if(!entries.length) entriesHtml = `<div class="empty-state">Sin registros para este dÃ­a.<br>Agrega tu primer alimento abajo â</div>`;
 
   document.getElementById('tracker-content').innerHTML = `
     <div class="date-nav">
-      <button class="nav-arrow" onclick="changeDay(-1)">‹</button>
-      <span class="date-label">${isToday?'Hoy — ':''}${fmtDate(viewDay)}</span>
-      <button class="nav-arrow" onclick="changeDay(1)">›</button>
+      <button class="nav-arrow" onclick="changeDay(-1)">â¹</button>
+      <span class="date-label">${isToday?'Hoy â ':''}${fmtDate(viewDay)}</span>
+      <button class="nav-arrow" onclick="changeDay(1)">âº</button>
     </div>
 
     <div class="metrics">
@@ -503,7 +512,7 @@ function renderHoy(){
       </div>
       <div class="metric ${metricClass}">
         <div class="val">${Math.abs(rest).toLocaleString()}</div>
-        <div class="lbl">${rest>=0?'kcal restantes':'kcal de más'}</div>
+        <div class="lbl">${rest>=0?'kcal restantes':'kcal de mÃ¡s'}</div>
       </div>
       <div class="metric">
         <div class="val">${entries.length}</div>
@@ -523,9 +532,10 @@ function renderHoy(){
 
     <div class="log-form">
       <div class="form-row">
-        <div class="form-field" style="flex:2">
+        <div class="form-field ac-wrap" style="flex:2" id="ac-wrap">
           <label>Alimento</label>
-          <input type="text" id="in-food" placeholder="ej. Tacos de frijol" onkeydown="if(event.key==='Enter')addEntry()">
+          <input type="text" id="in-food" placeholder="Buscar alimento…" autocomplete="off" oninput="acSearch(this.value)" onkeydown="acKeydown(event)" onfocus="acSearch(this.value)">
+          <div class="ac-list" id="ac-list" style="display:none"></div>
         </div>
         <div class="form-field" style="flex:1">
           <label>kcal</label>
@@ -547,7 +557,7 @@ function renderHoy(){
       <button class="btn-primary" onclick="addEntry()">+ Registrar alimento</button>
     </div>
 
-    <div class="section-label">Registro del día</div>
+    <div class="section-label">Registro del dÃ­a</div>
     ${entriesHtml}
   `;
 }
@@ -561,13 +571,13 @@ function addEntry(){
   const food = document.getElementById('in-food').value.trim();
   const cal = parseInt(document.getElementById('in-cal').value)||0;
   const meal = document.getElementById('in-meal').value;
-  if(!food||!cal){ toast('Completa nombre y calorías'); return; }
+  if(!food||!cal){ toast('Completa nombre y calorÃ­as'); return; }
   const log = getMemberLog(currentMember.id);
   if(!log[viewDay]) log[viewDay]=[];
   const now = new Date();
   log[viewDay].push({id:Date.now(), food, cal, meal, time:now.getHours()+':'+pad(now.getMinutes())});
   saveMemberLog(currentMember.id, log);
-  toast('✓ '+food+' — '+cal.toLocaleString()+' kcal');
+  toast('â '+food+' â '+cal.toLocaleString()+' kcal');
   renderHoy();
 }
 
@@ -580,7 +590,7 @@ function deleteEntry(day, id){
   renderHoy();
 }
 
-/* ═══ SEMANA ═══ */
+/* âââ SEMANA âââ */
 function getWeekDays(off){
   const today = new Date(); const dow = today.getDay()||7;
   const mon = new Date(today); mon.setDate(today.getDate()-dow+1+off*7);
@@ -605,7 +615,7 @@ function renderSemana(){
     weekGridHtml += `<div class="wday${k===todayK?' today':''}">
       <span class="wd-name">${DAY_LABELS[i]}</span>
       <div class="wd-bar-wrap"><div class="wd-fill" style="height:${pct}%;background:${color}"></div></div>
-      <span class="wd-val">${t>0?t.toLocaleString():'—'}</span>
+      <span class="wd-val">${t>0?t.toLocaleString():'â'}</span>
     </div>`;
   });
 
@@ -624,23 +634,23 @@ function renderSemana(){
 
   document.getElementById('tracker-content').innerHTML = `
     <div class="date-nav">
-      <button class="nav-arrow" onclick="changeWeek(-1)">‹</button>
-      <span class="date-label">${fmtShort(days[0])} – ${fmtShort(days[6])}</span>
-      <button class="nav-arrow" onclick="changeWeek(1)">›</button>
+      <button class="nav-arrow" onclick="changeWeek(-1)">â¹</button>
+      <span class="date-label">${fmtShort(days[0])} â ${fmtShort(days[6])}</span>
+      <button class="nav-arrow" onclick="changeWeek(1)">âº</button>
     </div>
     <div class="metrics">
       <div class="metric"><div class="val">${weekTotal.toLocaleString()}</div><div class="lbl">kcal esta semana</div></div>
       <div class="metric"><div class="val">${avg.toLocaleString()}</div><div class="lbl">promedio diario</div></div>
-      <div class="metric"><div class="val">${withData.length}/7</div><div class="lbl">días con registros</div></div>
+      <div class="metric"><div class="val">${withData.length}/7</div><div class="lbl">dÃ­as con registros</div></div>
     </div>
     <div class="week-grid">${weekGridHtml}</div>
-    <div class="section-label">Detalle por día</div>
+    <div class="section-label">Detalle por dÃ­a</div>
     ${barsHtml}
   `;
 }
 function changeWeek(d){ viewWeekOff+=d; renderSemana(); }
 
-/* ═══ MES ═══ */
+/* âââ MES âââ */
 function getMonthDays(off){
   const now=new Date(); const y=now.getFullYear(),m=now.getMonth()+off;
   const last=new Date(y,m+1,0);
@@ -669,11 +679,11 @@ function renderMes(){
     wHtml+=`<div class="mweek-row">
       <div>
         <div class="mw-label">Semana ${i+1}</div>
-        <div style="font-size:12px;color:var(--muted)">${fmtShort(w[0].k)} – ${fmtShort(w[w.length-1].k)}</div>
+        <div style="font-size:12px;color:var(--muted)">${fmtShort(w[0].k)} â ${fmtShort(w[w.length-1].k)}</div>
       </div>
       <div style="text-align:right">
         <div class="mw-val">${wTotal.toLocaleString()} kcal</div>
-        <div class="mw-sub">prom ${wAvg.toLocaleString()}/día</div>
+        <div class="mw-sub">prom ${wAvg.toLocaleString()}/dÃ­a</div>
       </div>
     </div>`;
   });
@@ -694,24 +704,24 @@ function renderMes(){
 
   document.getElementById('tracker-content').innerHTML = `
     <div class="date-nav">
-      <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
+      <button class="nav-arrow" onclick="changeMonth(-1)">â¹</button>
       <span class="date-label">${tgt.toLocaleDateString('es-MX',{month:'long',year:'numeric'})}</span>
-      <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+      <button class="nav-arrow" onclick="changeMonth(1)">âº</button>
     </div>
     <div class="metrics">
       <div class="metric"><div class="val">${monthTotal.toLocaleString()}</div><div class="lbl">kcal totales</div></div>
       <div class="metric"><div class="val">${avg.toLocaleString()}</div><div class="lbl">promedio diario</div></div>
-      <div class="metric green"><div class="val">${daysUnder}</div><div class="lbl">días dentro de meta</div></div>
+      <div class="metric green"><div class="val">${daysUnder}</div><div class="lbl">dÃ­as dentro de meta</div></div>
     </div>
     <div class="section-label">Por semana</div>
     ${wHtml}
-    <div class="section-label">Progreso por día</div>
+    <div class="section-label">Progreso por dÃ­a</div>
     ${bHtml}
   `;
 }
 function changeMonth(d){ viewMonthOff+=d; renderMes(); }
 
-/* ═══ PROFILE SETTINGS ═══ */
+/* âââ PROFILE SETTINGS âââ */
 function showProfileSettings(){
   const m = currentMember;
   let editEmoji = m.emoji, editColor = m.color;
@@ -743,7 +753,7 @@ function showProfileSettings(){
       <h3>Meta diaria</h3>
       <div class="card-block" style="padding:0">
         <div class="settings-row">
-          <span class="sr-label">kcal / día</span>
+          <span class="sr-label">kcal / dÃ­a</span>
           <input type="number" id="ps-goal" value="${m.goal}" min="500" max="5000">
         </div>
       </div>
@@ -781,7 +791,7 @@ function saveProfileSettings(){
   renderTab();
 }
 function deleteMember(id){
-  if(!confirm('¿Eliminar este perfil y todos sus registros?')) return;
+  if(!confirm('Â¿Eliminar este perfil y todos sus registros?')) return;
   members = members.filter(m=>m.id!==id);
   saveMembers();
   localStorage.removeItem('fk-log-'+id);
@@ -789,7 +799,41 @@ function deleteMember(id){
   goHome();
 }
 
-/* ═══ INIT ═══ */
+/* âââ INIT âââ */
+
+/* FOOD DB + AUTOCOMPLETE */
+const FOODS = [{"n":"Huevos revueltos (2)","p":"2 piezas","k":180},{"n":"Huevos fritos (2)","p":"2 piezas","k":200},{"n":"Huevos a la mexicana","p":"2 huevos","k":220},{"n":"Omelette","p":"2 huevos","k":250},{"n":"Huevo cocido","p":"1 pieza","k":78},{"n":"Chilaquiles rojos","p":"1 plato","k":450},{"n":"Chilaquiles verdes","p":"1 plato","k":420},{"n":"Hotcakes (2)","p":"2 piezas","k":350},{"n":"Molletes","p":"2 piezas","k":380},{"n":"Tamales de pollo","p":"1 pieza","k":310},{"n":"Tamales de rajas","p":"1 pieza","k":290},{"n":"Tamales de elote","p":"1 pieza","k":250},{"n":"Pan tostado","p":"1 rebanada","k":80},{"n":"Pan blanco","p":"1 rebanada","k":70},{"n":"Pan integral","p":"1 rebanada","k":65},{"n":"Pan dulce (concha)","p":"1 pieza","k":280},{"n":"Cuernito","p":"1 pieza","k":200},{"n":"Avena con leche","p":"1 taza","k":280},{"n":"Avena con agua","p":"1 taza","k":150},{"n":"Cereal con leche","p":"1 taza","k":250},{"n":"Taco de pollo","p":"1 taco","k":180},{"n":"Taco de carne asada","p":"1 taco","k":210},{"n":"Taco de pastor","p":"1 taco","k":190},{"n":"Taco de carnitas","p":"1 taco","k":220},{"n":"Taco de suadero","p":"1 taco","k":200},{"n":"Taco de bistec","p":"1 taco","k":205},{"n":"Taco de frijoles","p":"1 taco","k":160},{"n":"Taco de chorizo","p":"1 taco","k":240},{"n":"Taco de rajas","p":"1 taco","k":170},{"n":"Taco dorado de pollo","p":"1 taco","k":200},{"n":"Quesadilla","p":"1 pieza","k":280},{"n":"Quesadilla con pollo","p":"1 pieza","k":350},{"n":"Sope","p":"1 pieza","k":250},{"n":"Gordita","p":"1 pieza","k":300},{"n":"Tlacoyo","p":"1 pieza","k":280},{"n":"Huarache","p":"1 pieza","k":420},{"n":"Elote preparado","p":"1 pieza","k":350},{"n":"Esquite","p":"1 vaso","k":250},{"n":"Tostada de pollo","p":"1 pieza","k":200},{"n":"Burrito","p":"1 pieza","k":380},{"n":"Torta de pollo","p":"1 pieza","k":450},{"n":"Torta de jamon","p":"1 pieza","k":420},{"n":"Torta de milanesa","p":"1 pieza","k":520},{"n":"Torta de pierna","p":"1 pieza","k":500},{"n":"Sandwich de atun","p":"1 pieza","k":320},{"n":"Cemita","p":"1 pieza","k":550},{"n":"Pozole rojo","p":"1 plato","k":380},{"n":"Menudo","p":"1 plato","k":320},{"n":"Birria","p":"1 plato","k":350},{"n":"Caldo de pollo","p":"1 plato","k":200},{"n":"Consome de pollo","p":"1 taza","k":120},{"n":"Sopa de verduras","p":"1 plato","k":150},{"n":"Sopa de fideos","p":"1 plato","k":280},{"n":"Mole con pollo","p":"1 plato","k":480},{"n":"Enchiladas (3)","p":"3 piezas","k":450},{"n":"Enfrijoladas (3)","p":"3 piezas","k":400},{"n":"Pechuga de pollo a la plancha","p":"100g","k":165},{"n":"Milanesa de pollo","p":"1 pieza","k":280},{"n":"Milanesa de res","p":"1 pieza","k":320},{"n":"Carne asada","p":"100g","k":250},{"n":"Bistec de res","p":"100g","k":270},{"n":"Chuleta de cerdo","p":"1 pieza","k":290},{"n":"Pescado a la plancha","p":"100g","k":180},{"n":"Atun en agua","p":"1 lata","k":130},{"n":"Salmon","p":"100g","k":200},{"n":"Camarones","p":"100g","k":100},{"n":"Jamon de pavo","p":"2 rebanadas","k":80},{"n":"Chorizo","p":"100g","k":380},{"n":"Arroz blanco","p":"1 taza","k":200},{"n":"Arroz a la mexicana","p":"1 taza","k":220},{"n":"Frijoles de olla","p":"1 taza","k":230},{"n":"Frijoles refritos","p":"1 taza","k":280},{"n":"Tortilla de maiz","p":"1 pieza","k":52},{"n":"Tortilla de harina","p":"1 pieza","k":100},{"n":"Papa cocida","p":"1 mediana","k":130},{"n":"Papa al horno","p":"1 mediana","k":150},{"n":"Pasta cocida","p":"1 taza","k":220},{"n":"Espagueti con salsa","p":"1 plato","k":350},{"n":"Manzana","p":"1 mediana","k":80},{"n":"Platano","p":"1 mediana","k":90},{"n":"Naranja","p":"1 mediana","k":60},{"n":"Mango","p":"1 taza","k":100},{"n":"Papaya","p":"1 taza","k":55},{"n":"Sandia","p":"1 taza","k":50},{"n":"Melon","p":"1 taza","k":60},{"n":"Pera","p":"1 mediana","k":100},{"n":"Uvas","p":"1 taza","k":104},{"n":"Fresa","p":"1 taza","k":50},{"n":"Durazno","p":"1 mediana","k":60},{"n":"Guayaba","p":"1 mediana","k":37},{"n":"Pina","p":"1 taza","k":82},{"n":"Kiwi","p":"1 pieza","k":42},{"n":"Aguacate","p":"1/2 pieza","k":120},{"n":"Ensalada verde","p":"1 plato","k":25},{"n":"Ensalada cesar","p":"1 plato","k":350},{"n":"Brocoli","p":"1 taza","k":55},{"n":"Nopales","p":"1 taza","k":35},{"n":"Elote","p":"1 mazorca","k":130},{"n":"Leche entera","p":"1 vaso 250ml","k":150},{"n":"Leche descremada","p":"1 vaso 250ml","k":90},{"n":"Yogurt natural","p":"1 taza","k":100},{"n":"Yogurt griego","p":"1 taza","k":130},{"n":"Queso fresco","p":"30g","k":75},{"n":"Queso Oaxaca","p":"30g","k":110},{"n":"Queso panela","p":"30g","k":80},{"n":"Crema","p":"2 cdas","k":60},{"n":"Agua","p":"1 vaso","k":0},{"n":"Cafe negro","p":"1 taza","k":5},{"n":"Cafe con leche","p":"1 taza","k":60},{"n":"Cafe latte","p":"1 taza","k":190},{"n":"Jugo de naranja","p":"1 vaso","k":110},{"n":"Agua de jamaica","p":"1 vaso","k":80},{"n":"Agua de horchata","p":"1 vaso","k":150},{"n":"Licuado de platano","p":"1 vaso","k":200},{"n":"Refresco","p":"355ml","k":150},{"n":"Refresco light","p":"355ml","k":5},{"n":"Cerveza","p":"355ml","k":150},{"n":"Vino tinto","p":"1 copa","k":125},{"n":"Nueces","p":"30g","k":180},{"n":"Almendras","p":"30g","k":170},{"n":"Cacahuates","p":"30g","k":170},{"n":"Papas fritas (bolsa)","p":"bolsa chica","k":150},{"n":"Galletas Maria (6)","p":"6 piezas","k":160},{"n":"Galletas Oreo (3)","p":"3 piezas","k":160},{"n":"Chocolate","p":"30g","k":160},{"n":"Gansito","p":"1 pieza","k":230},{"n":"Pizza (rebanada)","p":"1 rebanada","k":280},{"n":"Hamburguesa","p":"1 pieza","k":450},{"n":"Hot dog","p":"1 pieza","k":300},{"n":"Nuggets de pollo (6)","p":"6 piezas","k":280},{"n":"Papas fritas (restaurante)","p":"porcion mediana","k":320},{"n":"Sushi (6 piezas)","p":"6 piezas","k":300}];
+let _acIdx = -1;
+function acSearch(val){
+  var list=document.getElementById("ac-list");
+  if(!list)return;
+  var q=val.trim().toLowerCase();
+  if(q.length<2){list.style.display="none";return;}
+  var m=FOODS.filter(function(f){return f.n.toLowerCase().indexOf(q)>=0;}).slice(0,8);
+  if(!m.length){list.innerHTML="<div class=\"ac-empty\">Sin resultados</div>";list.style.display="block";return;}
+  list.innerHTML=m.map(function(f){
+    var i=FOODS.indexOf(f);
+    return "<div class=\"ac-item\" onmousedown=\"acSelect("+i+")\">"+"<span class=\"ac-name\">"+f.n+"</span>"+"<span class=\"ac-portion\">"+f.p+"</span>"+"<span class=\"ac-kcal\">"+f.k+" kcal</span></div>";
+  }).join("");
+  list.style.display="block";_acIdx=-1;
+}
+function acSelect(idx){
+  var f=FOODS[idx];if(!f)return;
+  var fi=document.getElementById("in-food"),ci=document.getElementById("in-cal");
+  if(fi)fi.value=f.n;if(ci)ci.value=f.k;
+  acHide();if(ci)ci.focus();
+}
+function acHide(){ var l=document.getElementById("ac-list");if(l)l.style.display="none"; }
+function acKeydown(e){
+  var l=document.getElementById("ac-list");
+  if(!l||l.style.display==="none"){if(e.key==="Enter")addEntry();return;}
+  var items=l.querySelectorAll(".ac-item");
+  if(e.key==="ArrowDown"){e.preventDefault();_acIdx=Math.min(_acIdx+1,items.length-1);items.forEach(function(el,i){el.style.background=i===_acIdx?"var(--bg)":"";});}
+  else if(e.key==="ArrowUp"){e.preventDefault();_acIdx=Math.max(_acIdx-1,0);items.forEach(function(el,i){el.style.background=i===_acIdx?"var(--bg)":"";});}
+  else if(e.key==="Enter"){e.preventDefault();if(_acIdx>=0&&items[_acIdx])items[_acIdx].dispatchEvent(new Event("mousedown"));else addEntry();}
+  else if(e.key==="Escape")acHide();
+}
+document.addEventListener("click",function(e){if(!e.target.closest("#ac-wrap"))acHide();});
 loadMembers();
 showHome();
 
