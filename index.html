@@ -377,7 +377,11 @@ function toast(msg){
 
 /* ═══ STORAGE ═══ */
 /* ═══ SHEETS API ═══ */
-let SCRIPT_URL = localStorage.getItem('fk-script-url') || '';
+let SCRIPT_URL = '';
+
+function initScriptUrl() {
+  SCRIPT_URL = localStorage.getItem('fk-script-url') || '';
+}
 
 async function sheetsCall(action, body={}) {
   if (!SCRIPT_URL) return null;
@@ -1221,8 +1225,10 @@ async function syncAllNow() {
 
 /* ═══ INIT ═══ */
 async function init() {
+  initScriptUrl();
   await loadMembers();
   showHome();
+  updateSheetsStatusUI();
 }
 init();
 
