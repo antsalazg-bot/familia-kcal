@@ -381,13 +381,16 @@ let SCRIPT_URL = localStorage.getItem('fk-script-url') || '';
 async function sheetsCall(action, body={}) {
   if (!SCRIPT_URL) return null;
   try {
+    const payload = JSON.stringify({action, ...body});
+    // Use text/plain to avoid CORS preflight (OPTIONS) which Apps Script doesn't support
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({action, ...body})
+      body: payload,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
     });
     const d = await res.json();
     return d.ok ? d.data : null;
-  } catch(e) { return null; }
+  } catch(e) { console.warn('Sheets error:', e); return null; }
 }
 
 /* ═══ STORAGE (localStorage + Sheets sync) ═══ */
@@ -1164,7 +1167,8 @@ async function saveSheetsUrl() {
   try {
     const res = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify({action: 'ping'})
+      body: JSON.stringify({action: 'ping'}),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
     });
     const d = await res.json();
     if (d.ok) {
