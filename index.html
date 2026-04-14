@@ -377,10 +377,16 @@ function toast(msg){
 
 /* ═══ STORAGE ═══ */
 /* ═══ SHEETS API ═══ */
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytwTrqNCtBQEtECgeDQ371rURa6zHTQ54_z_6hfpWQZbO63qYejkUaJNz_3cLS1Jeo/exec';
+
 let SCRIPT_URL = '';
 
 function initScriptUrl() {
-  SCRIPT_URL = localStorage.getItem('fk-script-url') || '';
+  SCRIPT_URL = localStorage.getItem('fk-script-url') || DEFAULT_SCRIPT_URL;
+  // Always ensure default is saved
+  if (!localStorage.getItem('fk-script-url')) {
+    localStorage.setItem('fk-script-url', DEFAULT_SCRIPT_URL);
+  }
 }
 
 async function sheetsCall(action, body={}) {
