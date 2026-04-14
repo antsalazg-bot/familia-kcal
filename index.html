@@ -204,7 +204,55 @@ body { overflow: hidden; }
       <h2>Familia Kcal</h2>
       <p id="home-subtitle">Selecciona tu perfil</p>
     </div>
+    <!-- Planner shortcut -->
+    <div onclick="showPlanner()" style="display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;cursor:pointer;">
+      <div style="width:40px;height:40px;border-radius:var(--radius-sm);background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🍽️</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:600">Planificador de menú</div>
+        <div style="font-size:12px;color:var(--muted)">Genera tu plan de comidas del día con IA</div>
+      </div>
+      <span style="color:var(--muted);font-size:18px">›</span>
+    </div>
     <div class="member-grid" id="member-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ PLANNER SCREEN -->
+<div class="screen hidden" id="screen-planner">
+  <div class="header">
+    <button class="back-btn" onclick="showHome()">‹</button>
+    <h1>Planificador de menú</h1>
+  </div>
+  <div class="content">
+    <!-- Config -->
+    <div class="card-block" style="margin-bottom:16px">
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-field" style="flex:1;min-width:100px">
+          <label>Perfil</label>
+          <select id="planner-profile" style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text)"></select>
+        </div>
+        <div class="form-field" style="flex:1;min-width:100px">
+          <label>Tiempos de comida</label>
+          <select id="planner-meals" style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text)">
+            <option value="3">3 (Desayuno, Comida, Cena)</option>
+            <option value="5">5 (+ Lunch y Snack)</option>
+          </select>
+        </div>
+        <div class="form-field" style="flex:1;min-width:100px">
+          <label>Preferencias</label>
+          <select id="planner-pref" style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text)">
+            <option value="mexicana">Cocina mexicana</option>
+            <option value="variada">Variada</option>
+            <option value="ligera">Ligera / saludable</option>
+            <option value="vegetariana">Vegetariana</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generatePlan()" style="margin-top:12px" id="planner-btn">✨ Generar menú con IA</button>
+    </div>
+
+    <!-- Result -->
+    <div id="planner-result"></div>
   </div>
 </div>
 
@@ -1144,6 +1192,187 @@ function acHighlight(items) {
 document.addEventListener('click', e => {
   if (!e.target.closest('#ac-wrap')) acHide();
 });
+
+/* ═══ PLANNER ═══ */
+function showPlanner() {
+  showScreen('screen-planner');
+  // Populate profile selector
+  const sel = document.getElementById('planner-profile');
+  sel.innerHTML = members.map(m =>
+    `<option value="${m.id}">${m.emoji} ${m.name} (${m.goal} kcal)</option>`
+  ).join('');
+  if (!members.length) {
+    sel.innerHTML = '<option>Primero crea un perfil</option>';
+  }
+  document.getElementById('planner-result').innerHTML = '';
+}
+
+async function generatePlan() {
+  const profileId = document.getElementById('planner-profile').value;
+  const member = members.find(m => m.id === profileId) || members[0];
+  if (!member) { toast('Crea un perfil primero'); return; }
+
+  const nMeals = parseInt(document.getElementById('planner-meals').value);
+  const pref = document.getElementById('planner-pref').value;
+  const btn = document.getElementById('planner-btn');
+
+  btn.textContent = '⟳ Generando…';
+  btn.disabled = true;
+
+  const meals3 = 'Desayuno, Comida y Cena';
+  const meals5 = 'Desayuno, Lunch, Comida, Snack y Cena';
+  const mealStr = nMeals === 5 ? meals5 : meals3;
+
+  const distribuciones = nMeals === 5
+    ? 'Desayuno 20%, Lunch 15%, Comida 35%, Snack 10%, Cena 20%'
+    : 'Desayuno 25%, Comida 40%, Cena 35%';
+
+  const prompt = `Eres un nutriólogo experto en gastronomía ${pref}. Crea un plan de alimentación de UN día para una persona con meta de ${member.goal} kcal diarias.
+
+Tiempos: ${mealStr}
+Distribución calórica: ${distribuciones}
+Total: ${member.goal} kcal
+
+RESPONDE SOLO con JSON válido, sin texto adicional, con esta estructura exacta:
+{
+  "tiempos": [
+    {
+      "nombre": "Desayuno",
+      "kcal_objetivo": 500,
+      "platillos": [
+        {"nombre": "Avena con leche y fruta", "porcion": "1 taza + 1 fruta mediana", "kcal": 320},
+        {"nombre": "Café con leche", "porcion": "1 taza 250ml", "kcal": 60}
+      ],
+      "total_kcal": 380,
+      "tip": "Frase corta de consejo nutricional"
+    }
+  ],
+  "total_dia": ${member.goal},
+  "resumen": "Frase breve sobre el balance del día"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': '', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const d = await res.json();
+    const text = d.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const plan = JSON.parse(clean);
+    renderPlan(plan, member);
+  } catch(e) {
+    // Fallback: generate plan locally from FOODS db
+    renderLocalPlan(member, nMeals, pref);
+  }
+
+  btn.textContent = '✨ Generar menú con IA';
+  btn.disabled = false;
+}
+
+function renderLocalPlan(member, nMeals, pref) {
+  // Fallback local plan using FOODS array
+  const goal = member.goal;
+  const timeNames = nMeals === 5
+    ? ['Desayuno','Lunch','Comida','Snack','Cena']
+    : ['Desayuno','Comida','Cena'];
+  const percents = nMeals === 5 ? [0.20,0.15,0.35,0.10,0.20] : [0.25,0.40,0.35];
+
+  const plan = {
+    tiempos: timeNames.map((nombre, i) => {
+      const target = Math.round(goal * percents[i]);
+      // Pick random foods that fit roughly
+      const pool = FOODS.slice().sort(() => Math.random() - 0.5);
+      const platillos = [];
+      let total = 0;
+      for (const f of pool) {
+        if (total + f.k <= target + 50 && platillos.length < 3) {
+          platillos.push({nombre: f.n, porcion: f.p, kcal: f.k});
+          total += f.k;
+          if (total >= target * 0.8) break;
+        }
+      }
+      return { nombre, kcal_objetivo: target, platillos, total_kcal: total, tip: '' };
+    }),
+    total_dia: goal,
+    resumen: `Plan de ${goal} kcal con ${timeNames.length} tiempos de comida.`
+  };
+  renderPlan(plan, member);
+}
+
+const MEAL_ICON = {Desayuno:'🌅',Lunch:'☀️',Comida:'🍽️',Snack:'🍎',Cena:'🌙'};
+
+function renderPlan(plan, member) {
+  const totalReal = plan.tiempos.reduce((s,t) => s + (t.total_kcal||0), 0);
+  let html = `
+    <div class="section-label">Menú para ${member.emoji} ${member.name} — ${member.goal} kcal</div>
+    <div class="card-block" style="margin-bottom:16px;background:var(--green-pale)">
+      <p style="font-size:13px;color:var(--green)">${plan.resumen || ''}</p>
+      <p style="font-size:13px;color:var(--green);margin-top:4px">Total estimado: <strong>${totalReal} kcal</strong></p>
+    </div>`;
+
+  plan.tiempos.forEach(t => {
+    const icon = MEAL_ICON[t.nombre] || '🍽️';
+    html += `
+    <div class="card-block" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:15px;font-weight:600">${icon} ${t.nombre}</div>
+        <div style="font-size:13px;color:var(--muted)">${t.total_kcal || t.kcal_objetivo} kcal</div>
+      </div>`;
+
+    (t.platillos||[]).forEach(p => {
+      html += `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);gap:8px">
+        <div style="flex:1">
+          <div style="font-size:14px">${p.nombre}</div>
+          <div style="font-size:12px;color:var(--hint)">${p.porcion}</div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--green-light);margin-right:8px">${p.kcal} kcal</div>
+        <button onclick="logPlanItem('${p.nombre.replace(/'/g,"\\'")}',${p.kcal},'${t.nombre.toLowerCase()}')" 
+          style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">
+          + Registrar
+        </button>
+      </div>`;
+    });
+
+    if (t.tip) html += `<p style="font-size:12px;color:var(--muted);margin-top:8px;font-style:italic">💡 ${t.tip}</p>`;
+    html += `</div>`;
+  });
+
+  document.getElementById('planner-result').innerHTML = html;
+}
+
+function logPlanItem(food, kcal, meal) {
+  // Find meal type
+  const mealMap = {desayuno:'desayuno',lunch:'lunch',comida:'comida',snack:'snack',cena:'cena'};
+  const mealKey = mealMap[meal] || 'comida';
+
+  // If no current member, show selector
+  if (!currentMember) {
+    // Pick first member
+    if (members.length > 0) {
+      currentMember = members[0];
+    } else {
+      toast('Crea un perfil primero');
+      return;
+    }
+  }
+
+  const log = getMemberLog(currentMember.id);
+  const today = todayKey();
+  if (!log[today]) log[today] = [];
+  const now = new Date();
+  const entry = {id: Date.now(), food, cal: kcal, meal: mealKey, time: now.getHours()+':'+pad(now.getMinutes())};
+  log[today].push(entry);
+  saveMemberLog(currentMember.id, log);
+  saveLogRemote(currentMember.id, entry, today);
+  toast(`✓ ${food} registrado`);
+}
 
 /* ═══ SHEETS CONFIG UI ═══ */
 function showSheetsConfig() {
