@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FamiliaKcal">
+<meta name="theme-color" content="#0F6E56">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Familia Kcal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #0F6E56; --green-light: #1D9E75; --green-pale: #E1F5EE;
+  --amber: #BA7517; --amber-pale: #FAEEDA;
+  --red: #A32D2D; --red-pale: #FCEBEB;
+  --blue: #185FA5; --blue-pale: #E6F1FB;
+  --purple: #534AB7; --purple-pale: #EEEDFE;
+  --coral: #993C1D; --coral-pale: #FAECE7;
+  --bg: #f8f7f4; --surface: #ffffff; --border: rgba(0,0,0,0.10);
+  --text: #1a1a18; --muted: #6b6b66; --hint: #a8a8a2;
+  --radius: 14px; --radius-sm: 8px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141412; --surface: #1e1e1b; --border: rgba(255,255,255,0.10);
+    --text: #f0efe8; --muted: #9a9a94; --hint: #5a5a56;
+    --green-pale: #04342C; --amber-pale: #412402; --red-pale: #501313;
+    --blue-pale: #042C53; --purple-pale: #26215C; --coral-pale: #4A1B0C;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 16px; -webkit-text-size-adjust: 100%; }
+body { overflow: hidden; }
+
+/* ── SCREENS ── */
+.screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s ease, opacity 0.3s ease; }
+.screen.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.screen.slide-out { transform: translateX(-40%); opacity: 0; pointer-events: none; }
+
+/* ── HEADER ── */
+.header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; background: var(--surface); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+.header h1 { font-size: 17px; font-weight: 600; flex: 1; }
+.header .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--green-light); padding: 0 4px; line-height: 1; }
+.header .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 4px; }
+
+/* ── SCROLLABLE CONTENT ── */
+.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 20px calc(var(--safe-bottom) + 90px); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; padding: 0 0 var(--safe-bottom); }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 6px; background: none; border: none; cursor: pointer; color: var(--hint); transition: color 0.2s; }
+.nav-btn.active { color: var(--green-light); }
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-btn span { font-size: 10px; font-weight: 500; font-family: inherit; }
+
+/* ── HOME SCREEN ── */
+.home-logo { text-align: center; padding: 32px 0 24px; }
+.home-logo .logo-ring { width: 72px; height: 72px; border-radius: 50%; background: var(--green); display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 12px; }
+.home-logo h2 { font-size: 22px; font-weight: 600; }
+.home-logo p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.member-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.member-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; active-scale: 0.97; }
+.member-card:active { transform: scale(0.97); }
+.avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; flex-shrink: 0; }
+.member-card .name { font-size: 15px; font-weight: 600; }
+.member-card .stats { font-size: 12px; color: var(--muted); text-align: center; }
+.add-member-card { background: none; border: 1.5px dashed var(--border); border-radius: var(--radius); padding: 18px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--muted); min-height: 140px; }
+.add-member-card span { font-size: 32px; line-height: 1; }
+.add-member-card p { font-size: 13px; font-weight: 500; }
+
+/* ── METRIC CARDS ── */
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; }
+.metric .val { font-size: 20px; font-weight: 600; line-height: 1.1; }
+.metric .lbl { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+.metric.green .val { color: var(--green-light); }
+.metric.amber .val { color: var(--amber); }
+.metric.red .val { color: var(--red); }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
+.prog-bar { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; margin: 8px 0 6px; }
+.prog-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.3s; }
+.prog-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+/* ── LOG FORM ── */
+.log-form { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+.form-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.form-field input, .form-field select { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 15px; font-family: inherit; color: var(--text); -webkit-appearance: none; outline: none; }
+.form-field input:focus, .form-field select:focus { border-color: var(--green-light); }
+.ac-wrap { position: relative; }
+.ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 0.5px solid var(--color-border-secondary, var(--border)); border-radius: var(--radius-sm); z-index: 200; max-height: 220px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.ac-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; border-bottom: 0.5px solid var(--border); gap: 8px; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:active { background: var(--bg); }
+.ac-item .ac-name { font-size: 14px; flex: 1; }
+.ac-item .ac-portion { font-size: 12px; color: var(--hint); }
+.ac-item .ac-kcal { font-size: 14px; font-weight: 600; color: var(--green-light); white-space: nowrap; }
+.ac-empty { padding: 12px 14px; font-size: 13px; color: var(--hint); text-align: center; }
+.btn-primary { background: var(--green); color: #fff; border: none; border-radius: var(--radius-sm); padding: 12px 20px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; width: 100%; transition: opacity 0.15s; }
+.btn-primary:active { opacity: 0.85; }
+
+/* ── MEAL GROUPS ── */
+.meal-section { margin-bottom: 14px; }
+.meal-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.meal-dot { width: 8px; height: 8px; border-radius: 50%; }
+.meal-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; flex: 1; }
+.meal-total { font-size: 13px; font-weight: 600; color: var(--muted); }
+.entry { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.entry .en-name { flex: 1; font-size: 15px; }
+.entry .en-time { font-size: 12px; color: var(--hint); }
+.entry .en-cal { font-size: 15px; font-weight: 600; min-width: 64px; text-align: right; }
+.del-btn { background: none; border: none; color: var(--hint); font-size: 20px; cursor: pointer; padding: 0 2px; line-height: 1; }
+.del-btn:active { color: var(--red); }
+.empty-state { text-align: center; padding: 32px 20px; color: var(--hint); font-size: 14px; line-height: 1.6; }
+
+/* ── DATE NAV ── */
+.date-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.date-nav .nav-arrow { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 18px; cursor: pointer; color: var(--text); }
+.date-nav .date-label { flex: 1; text-align: center; font-size: 15px; font-weight: 600; }
+
+/* ── BARS ── */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bar-row .bl { font-size: 13px; color: var(--muted); min-width: 72px; }
+.bar-track { flex: 1; height: 22px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: var(--radius-sm); transition: width 0.4s ease; }
+.bar-row .bv { font-size: 13px; font-weight: 600; min-width: 60px; text-align: right; }
+
+/* ── WEEK GRID ── */
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+.wday { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.wday.today { border-color: var(--green-light); border-width: 1.5px; }
+.wday .wd-name { font-size: 10px; color: var(--muted); font-weight: 500; }
+.wday .wd-bar-wrap { width: 100%; height: 48px; background: var(--bg); border-radius: 4px; display: flex; align-items: flex-end; overflow: hidden; }
+.wday .wd-fill { width: 100%; border-radius: 4px; transition: height 0.4s ease; }
+.wday .wd-val { font-size: 9px; font-weight: 600; color: var(--muted); }
+
+/* ── MONTH WEEK ROWS ── */
+.mweek-row { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; margin-bottom: 8px; }
+.mweek-row .mw-label { flex: 1; font-size: 14px; }
+.mweek-row .mw-sub { font-size: 12px; color: var(--muted); }
+.mweek-row .mw-val { font-size: 15px; font-weight: 600; margin-left: 12px; }
+
+/* ── PROFILE SCREEN ── */
+.settings-section { margin-bottom: 24px; }
+.settings-section h3 { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.settings-row { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.settings-row .sr-label { font-size: 15px; }
+.settings-row .sr-val { font-size: 15px; color: var(--muted); }
+.settings-row input { background: none; border: none; font-size: 15px; font-family: inherit; color: var(--text); text-align: right; width: 100px; outline: none; }
+.color-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-opt { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s; }
+.color-opt.selected { border-color: var(--text); }
+.emoji-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.emoji-opt { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: var(--bg); border: 1.5px solid transparent; transition: border-color 0.15s; }
+.emoji-opt.selected { border-color: var(--green-light); }
+.btn-danger { background: none; border: 1px solid var(--red); color: var(--red); border-radius: var(--radius-sm); padding: 12px 20px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; width: 100%; }
+
+/* ── NEW MEMBER FORM ── */
+.new-member-screen { }
+.big-avatar { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; margin: 0 auto 24px; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: calc(var(--safe-bottom) + 80px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── SECTION LABEL ── */
+.section-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; margin-top: 20px; }
+.card-block { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SYNC BADGE -->
+<div id="sync-badge" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:12px;z-index:200;font-size:11px;color:var(--green-light);background:var(--surface);padding:3px 8px;border-radius:20px;border:0.5px solid var(--border);opacity:0;transition:opacity .3s;pointer-events:none"></div>
+
+<!-- ═══════════════════════════════════════════ HOME SCREEN -->
+<div class="screen" id="screen-home">
+  <div class="header" style="border-bottom:none;background:transparent">
+    <h1>Familia Kcal</h1>
+    <button class="icon-btn" onclick="showSheetsConfig()" title="Configurar Sheets" id="sheets-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+    </button>
+    <button class="icon-btn" onclick="showNewMember()" title="Agregar miembro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="19" y1="3" x2="19" y2="9"/><line x1="16" y1="6" x2="22" y2="6"/></svg>
+    </button>
+  </div>
+  <div class="content" style="padding-bottom:20px">
+    <div class="home-logo">
+      <div class="logo-ring">🥦</div>
+      <h2>Familia Kcal</h2>
+      <p id="home-subtitle">Selecciona tu perfil</p>
+    </div>
+    <div class="member-grid" id="member-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ SHEETS CONFIG SCREEN -->
+<div class="screen hidden" id="screen-sheets">
+  <div class="header">
+    <button class="back-btn" onclick="showHome()">‹</button>
+    <h1>Sincronización Google Sheets</h1>
+  </div>
+  <div class="content">
+    <div class="settings-section">
+      <h3>Estado</h3>
+      <div class="card-block" id="sheets-status-card">
+        <p style="font-size:14px;color:var(--muted)" id="sheets-status-txt">Sin configurar — los datos solo se guardan localmente.</p>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>URL del Apps Script</h3>
+      <div class="card-block" style="padding:0">
+        <div class="settings-row">
+          <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/..." style="width:100%;text-align:left;font-size:13px;font-family:var(--font-mono,monospace)">
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px">Pega aquí la URL de tu Google Apps Script desplegado.</p>
+    </div>
+    <button class="btn-primary" onclick="saveSheetsUrl()" style="margin-bottom:12px">Guardar y probar conexión</button>
+    <button class="btn-primary" onclick="syncAllNow()" style="background:var(--blue);margin-bottom:12px" id="sync-all-btn" disabled>↑↓ Sincronizar todo ahora</button>
+    <button class="btn-danger" onclick="clearSheetsUrl()">Desconectar Sheets</button>
+
+    <div class="settings-section" style="margin-top:28px">
+      <h3>Cómo configurar</h3>
+      <div class="card-block">
+        <p style="font-size:13px;line-height:1.8;color:var(--muted)">
+          1. Abre <strong style="color:var(--text)">script.google.com</strong> y crea un nuevo proyecto<br>
+          2. Borra el contenido y pega el código del archivo <strong style="color:var(--text)">Code.gs</strong><br>
+          3. Clic en <strong style="color:var(--text)">Implementar → Nueva implementación</strong><br>
+          4. Tipo: <strong style="color:var(--text)">Aplicación web</strong><br>
+          5. Ejecutar como: <strong style="color:var(--text)">Yo</strong> · Acceso: <strong style="color:var(--text)">Cualquier persona</strong><br>
+          6. Copia la URL y pégala arriba
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ NEW MEMBER SCREEN -->
+<div class="screen hidden" id="screen-new-member">
+  <div class="header">
+    <button class="back-btn" onclick="showHome()">‹</button>
+    <h1 id="nm-title">Nuevo integrante</h1>
+  </div>
+  <div class="content">
+    <div class="big-avatar" id="nm-preview">😊</div>
+
+    <div class="settings-section">
+      <h3>Emoji</h3>
+      <div class="emoji-picker" id="nm-emoji-picker"></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Nombre</h3>
+      <div class="card-block" style="padding:0">
+        <div class="settings-row">
+          <input type="text" id="nm-name" placeholder="Tu nombre" style="width:100%;text-align:left;font-size:16px">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Color</h3>
+      <div class="color-picker" id="nm-color-picker"></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Meta diaria de calorías</h3>
+      <div class="card-block" style="padding:0">
+        <div class="settings-row">
+          <span class="sr-label">kcal / día</span>
+          <input type="number" id="nm-goal" value="2000" min="500" max="5000">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="nm-save-btn" onclick="saveMember()">Guardar perfil</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TRACKER SCREEN -->
+<div class="screen hidden" id="screen-tracker">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div id="tracker-avatar" class="avatar" style="width:32px;height:32px;font-size:16px"></div>
+    <h1 id="tracker-name" style="font-size:16px"></h1>
+    <button class="icon-btn" onclick="showProfileSettings()" title="Ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <!-- TAB CONTENT -->
+  <div class="content" id="tracker-content">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-hoy" onclick="switchTab('hoy')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Hoy</span>
+    </button>
+    <button class="nav-btn" id="nav-semana" onclick="switchTab('semana')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Semana</span>
+    </button>
+    <button class="nav-btn" id="nav-mes" onclick="switchTab('mes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+      <span>Mes</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════════════ PROFILE SETTINGS SCREEN -->
+<div class="screen hidden" id="screen-profile">
+  <div class="header">
+    <button class="back-btn" onclick="backToTracker()">‹</button>
+    <h1>Perfil</h1>
+  </div>
+  <div class="content">
+    <div id="profile-content"></div>
+  </div>
+</div>
+
+<script>
+/* ═══ DATA ═══ */
+const COLORS = ['#0F6E56','#534AB7','#D85A30','#185FA5','#A32D2D','#3B6D11','#BA7517','#993556'];
+const EMOJIS = ['😊','💪','🧑','👩','👦','👧','🧔','👴','👵','🍎','🥗','🏃','🧘','⚡','🌟','🦸'];
+const MEAL_COLORS = {desayuno:'#378ADD',lunch:'#1D9E75',comida:'#EF9F27',cena:'#534AB7',snack:'#D85A30'};
+const MEAL_NAMES = {desayuno:'Desayuno',lunch:'Lunch',comida:'Comida',cena:'Cena',snack:'Snack'};
+const MEAL_ORDER = ['desayuno','lunch','comida','cena','snack'];
+
+let members = [];
+let currentMember = null;
+let currentTab = 'hoy';
+let viewDay = todayKey();
+let viewWeekOff = 0;
+let viewMonthOff = 0;
+let editingMemberId = null;
+
+/* ═══ UTILS ═══ */
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+function keyToDate(k){ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
+function dateToKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function fmtDate(k){
+  return keyToDate(k).toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+}
+function fmtShort(k){
+  return keyToDate(k).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+}
+function uid(){ return Date.now()+''+Math.floor(Math.random()*1000); }
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+/* ═══ STORAGE ═══ */
+/* ═══ SHEETS API ═══ */
+let SCRIPT_URL = localStorage.getItem('fk-script-url') || '';
+
+async function sheetsCall(action, body={}) {
+  if (!SCRIPT_URL) return null;
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({action, ...body})
+    });
+    const d = await res.json();
+    return d.ok ? d.data : null;
+  } catch(e) { return null; }
+}
+
+/* ═══ STORAGE (localStorage + Sheets sync) ═══ */
+function saveMembers(){
+  localStorage.setItem('fk-members', JSON.stringify(members));
+}
+
+async function loadMembers(){
+  // Try Sheets first, fallback to localStorage
+  if (SCRIPT_URL) {
+    showSyncBadge(true);
+    const remote = await sheetsCall('getProfiles');
+    if (remote && remote.length >= 0) {
+      members = remote.map(r => ({
+        id: r.id, name: r.nombre, emoji: r.emoji,
+        color: r.color, goal: Number(r.goal)
+      }));
+      localStorage.setItem('fk-members', JSON.stringify(members));
+      showSyncBadge(false);
+      return;
+    }
+    showSyncBadge(false);
+  }
+  try { members = JSON.parse(localStorage.getItem('fk-members'))||[]; } catch(e){ members=[]; }
+}
+
+async function saveMembersRemote(m) {
+  await sheetsCall('saveProfile', {
+    id: m.id, nombre: m.name, emoji: m.emoji, color: m.color, goal: m.goal
+  });
+}
+
+async function deleteMemberRemote(id) {
+  await sheetsCall('deleteProfile', {id});
+}
+
+/* ── LOGS ── */
+function getMemberLog(mid){
+  try{ return JSON.parse(localStorage.getItem('fk-log-'+mid))||{}; }catch(e){ return {}; }
+}
+
+function saveMemberLog(mid, log){
+  localStorage.setItem('fk-log-'+mid, JSON.stringify(log));
+}
+
+async function saveLogRemote(mid, entry, fecha) {
+  await sheetsCall('saveLog', {
+    id: String(entry.id), profile_id: mid, fecha,
+    alimento: entry.food, kcal: entry.cal, meal: entry.meal, hora: entry.time||''
+  });
+}
+
+async function deleteLogRemote(logId) {
+  await sheetsCall('deleteLog', {id: String(logId)});
+}
+
+async function syncLogsFromSheets(mid) {
+  if (!SCRIPT_URL) return;
+  showSyncBadge(true);
+  const logs = await sheetsCall('getLogs', {profileId: mid});
+  if (!logs) { showSyncBadge(false); return; }
+  // Rebuild local log structure from Sheets data
+  const logMap = {};
+  logs.forEach(r => {
+    const fecha = String(r.fecha).substring(0,10);
+    if (!logMap[fecha]) logMap[fecha] = [];
+    logMap[fecha].push({
+      id: Number(r.id) || r.id, food: r.alimento,
+      cal: Number(r.kcal), meal: r.meal, time: r.hora
+    });
+  });
+  saveMemberLog(mid, logMap);
+  showSyncBadge(false);
+}
+
+function dayTotal(mid, k){ return (getMemberLog(mid)[k]||[]).reduce((s,e)=>s+e.cal,0); }
+
+/* ── SYNC BADGE ── */
+function showSyncBadge(syncing) {
+  let badge = document.getElementById('sync-badge');
+  if (!badge) return;
+  badge.textContent = syncing ? '⟳ Sincronizando…' : '';
+  badge.style.opacity = syncing ? '1' : '0';
+}
+
+/* ═══ SCREEN TRANSITIONS ═══ */
+function showScreen(id, from){
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('slide-out'); s.classList.add('hidden'); });
+  document.getElementById(id).classList.remove('hidden');
+}
+function showHome(){ showScreen('screen-home'); renderHome(); }
+function goHome(){ currentMember = null; viewDay = todayKey(); viewWeekOff = 0; viewMonthOff = 0; showHome(); }
+function backToTracker(){ showScreen('screen-tracker'); }
+
+/* ═══ HOME ═══ */
+function renderHome(){
+  const grid = document.getElementById('member-grid');
+  let html = '';
+  members.forEach(m => {
+    const log = getMemberLog(m.id);
+    const todayKcal = dayTotal(m.id, todayKey());
+    const pct = Math.min(100, Math.round(todayKcal/m.goal*100));
+    html += `<div class="member-card" onclick="selectMember('${m.id}')">
+      <div class="avatar" style="background:${m.color}20;color:${m.color};font-size:28px">${m.emoji}</div>
+      <span class="name">${m.name}</span>
+      <div style="width:100%;background:var(--bg);border-radius:4px;height:4px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${m.color};border-radius:4px;transition:width .4s"></div>
+      </div>
+      <span class="stats">${todayKcal>0 ? todayKcal.toLocaleString()+' kcal hoy' : 'Sin registros hoy'}</span>
+    </div>`;
+  });
+  html += `<div class="add-member-card" onclick="showNewMember()"><span>+</span><p>Agregar integrante</p></div>`;
+  grid.innerHTML = html;
+}
+
+async function selectMember(id){
+  currentMember = members.find(m=>m.id===id);
+  if(!currentMember) return;
+  viewDay = todayKey();
+  currentTab = 'hoy';
+  showScreen('screen-tracker');
+  updateTrackerHeader();
+  switchTab('hoy');
+  // Sync logs from Sheets in background
+  await syncLogsFromSheets(id);
+  renderTab();
+}
+
+function updateTrackerHeader(){
+  document.getElementById('tracker-name').textContent = currentMember.name;
+  const av = document.getElementById('tracker-avatar');
+  av.textContent = currentMember.emoji;
+  av.style.background = currentMember.color+'20';
+}
+
+/* ═══ NEW / EDIT MEMBER ═══ */
+let nmEmoji = '😊', nmColor = COLORS[0];
+
+function showNewMember(memberId){
+  editingMemberId = memberId || null;
+  const m = memberId ? members.find(x=>x.id===memberId) : null;
+  nmEmoji = m ? m.emoji : '😊';
+  nmColor = m ? m.color : COLORS[0];
+
+  document.getElementById('nm-title').textContent = m ? 'Editar perfil' : 'Nuevo integrante';
+  document.getElementById('nm-name').value = m ? m.name : '';
+  document.getElementById('nm-goal').value = m ? m.goal : 2000;
+  document.getElementById('nm-save-btn').textContent = m ? 'Guardar cambios' : 'Guardar perfil';
+
+  // Emoji picker
+  const ep = document.getElementById('nm-emoji-picker');
+  ep.innerHTML = EMOJIS.map(e=>`<div class="emoji-opt${e===nmEmoji?' selected':''}" onclick="pickEmoji('${e}')" data-e="${e}">${e}</div>`).join('');
+
+  // Color picker
+  const cp = document.getElementById('nm-color-picker');
+  cp.innerHTML = COLORS.map(c=>`<div class="color-opt${c===nmColor?' selected':''}" onclick="pickColor('${c}')" data-c="${c}" style="background:${c}"></div>`).join('');
+
+  updateNMPreview();
+  showScreen('screen-new-member');
+}
+
+function pickEmoji(e){
+  nmEmoji = e;
+  document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.toggle('selected',el.dataset.e===e));
+  updateNMPreview();
+}
+function pickColor(c){
+  nmColor = c;
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.toggle('selected',el.dataset.c===c));
+  updateNMPreview();
+}
+function updateNMPreview(){
+  const p = document.getElementById('nm-preview');
+  p.textContent = nmEmoji;
+  p.style.background = nmColor+'20';
+  p.style.color = nmColor;
+}
+
+async function saveMember(){
+  const name = document.getElementById('nm-name').value.trim();
+  const goal = parseInt(document.getElementById('nm-goal').value)||2000;
+  if(!name){ toast('Escribe un nombre'); return; }
+
+  if(editingMemberId){
+    const idx = members.findIndex(m=>m.id===editingMemberId);
+    if(idx>=0){ members[idx] = {...members[idx], name, goal, emoji:nmEmoji, color:nmColor}; }
+    saveMembers();
+    saveMembersRemote(members[idx]);
+    toast('Perfil actualizado');
+    currentMember = members[idx];
+    updateTrackerHeader();
+    showScreen('screen-tracker');
+  } else {
+    const m = {id: uid(), name, goal, emoji: nmEmoji, color: nmColor};
+    members.push(m);
+    saveMembers();
+    saveMembersRemote(m);
+    toast('¡Bienvenid@ '+name+'!');
+    selectMember(m.id);
+  }
+}
+
+/* ═══ TRACKER TABS ═══ */
+function switchTab(tab){
+  currentTab = tab;
+  ['hoy','semana','mes'].forEach(t=>{
+    document.getElementById('nav-'+t).classList.toggle('active', t===tab);
+  });
+  renderTab();
+}
+
+function renderTab(){
+  if(currentTab==='hoy') renderHoy();
+  else if(currentTab==='semana') renderSemana();
+  else renderMes();
+}
+
+/* ═══ HOY ═══ */
+function renderHoy(){
+  const log = getMemberLog(currentMember.id);
+  const entries = log[viewDay]||[];
+  const total = entries.reduce((s,e)=>s+e.cal,0);
+  const rest = currentMember.goal - total;
+  const pct = Math.min(100, Math.round(total/currentMember.goal*100));
+  const barColor = pct<75?'#1D9E75':pct<100?'#EF9F27':'#E24B4A';
+  const isToday = viewDay===todayKey();
+
+  let metricClass = rest>=0 ? (pct>=90?'amber':'green') : 'red';
+  let restLabel = rest>=0 ? rest.toLocaleString()+' restantes' : Math.abs(rest).toLocaleString()+' extra';
+
+  // Meal groups
+  const meals = {};
+  entries.forEach(e=>{ if(!meals[e.meal]) meals[e.meal]=[]; meals[e.meal].push(e); });
+  let entriesHtml = '';
+  MEAL_ORDER.forEach(m=>{
+    if(!meals[m]) return;
+    const mt = meals[m].reduce((s,e)=>s+e.cal,0);
+    entriesHtml += `<div class="meal-section">
+      <div class="meal-header">
+        <div class="meal-dot" style="background:${MEAL_COLORS[m]}"></div>
+        <span class="meal-title">${MEAL_NAMES[m]}</span>
+        <span class="meal-total">${mt.toLocaleString()} kcal</span>
+      </div>`;
+    meals[m].forEach(e=>{
+      entriesHtml += `<div class="entry">
+        <span class="en-name">${e.food}</span>
+        <span class="en-time">${e.time||''}</span>
+        <span class="en-cal">${e.cal.toLocaleString()} kcal</span>
+        <button class="del-btn" onclick="deleteEntry('${viewDay}',${e.id})">×</button>
+      </div>`;
+    });
+    entriesHtml += `</div>`;
+  });
+  if(!entries.length) entriesHtml = `<div class="empty-state">Sin registros para este día.<br>Agrega tu primer alimento abajo ↓</div>`;
+
+  document.getElementById('tracker-content').innerHTML = `
+    <div class="date-nav">
+      <button class="nav-arrow" onclick="changeDay(-1)">‹</button>
+      <span class="date-label">${isToday?'Hoy — ':''}${fmtDate(viewDay)}</span>
+      <button class="nav-arrow" onclick="changeDay(1)">›</button>
+    </div>
+
+    <div class="metrics">
+      <div class="metric green">
+        <div class="val">${total.toLocaleString()}</div>
+        <div class="lbl">kcal consumidas</div>
+      </div>
+      <div class="metric ${metricClass}">
+        <div class="val">${Math.abs(rest).toLocaleString()}</div>
+        <div class="lbl">${rest>=0?'kcal restantes':'kcal de más'}</div>
+      </div>
+      <div class="metric">
+        <div class="val">${entries.length}</div>
+        <div class="lbl">registros</div>
+      </div>
+    </div>
+
+    <div class="prog-wrap">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted)">
+        <span>Progreso diario</span>
+        <span>${pct}% de ${currentMember.goal.toLocaleString()} kcal</span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:${pct}%;background:${barColor}"></div>
+      </div>
+    </div>
+
+    <div class="log-form">
+      <div class="form-row">
+        <div class="form-field ac-wrap" style="flex:2" id="ac-wrap">
+          <label>Alimento</label>
+          <input type="text" id="in-food" placeholder="Buscar alimento…" autocomplete="off" oninput="acSearch(this.value)" onkeydown="acKeydown(event)" onfocus="acSearch(this.value)">
+          <div class="ac-list" id="ac-list" style="display:none"></div>
+        </div>
+        <div class="form-field" style="flex:1">
+          <label>kcal</label>
+          <input type="number" id="in-cal" placeholder="—" min="0" onkeydown="if(event.key==='Enter')addEntry()">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-field" style="flex:1">
+          <label>Comida</label>
+          <select id="in-meal">
+            <option value="desayuno">Desayuno</option>
+            <option value="lunch" selected>Lunch</option>
+            <option value="comida">Comida</option>
+            <option value="cena">Cena</option>
+            <option value="snack">Snack</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addEntry()">+ Registrar alimento</button>
+    </div>
+
+    <div class="section-label">Registro del día</div>
+    ${entriesHtml}
+  `;
+}
+
+function changeDay(d){
+  const dt = keyToDate(viewDay); dt.setDate(dt.getDate()+d);
+  viewDay = dateToKey(dt); renderHoy();
+}
+
+function addEntry(){
+  const food = document.getElementById('in-food').value.trim();
+  const cal = parseInt(document.getElementById('in-cal').value)||0;
+  const meal = document.getElementById('in-meal').value;
+  if(!food||!cal){ toast('Completa nombre y calorías'); return; }
+  acHide();
+  const log = getMemberLog(currentMember.id);
+  if(!log[viewDay]) log[viewDay]=[];
+  const now = new Date();
+  const entry = {id:Date.now(), food, cal, meal, time:now.getHours()+':'+pad(now.getMinutes())};
+  log[viewDay].push(entry);
+  saveMemberLog(currentMember.id, log);
+  saveLogRemote(currentMember.id, entry, viewDay);
+  toast('✓ '+food+' — '+cal.toLocaleString()+' kcal');
+  renderHoy();
+}
+
+function deleteEntry(day, id){
+  const log = getMemberLog(currentMember.id);
+  if(!log[day]) return;
+  log[day] = log[day].filter(e=>e.id!==id);
+  if(!log[day].length) delete log[day];
+  saveMemberLog(currentMember.id, log);
+  deleteLogRemote(id);
+  renderHoy();
+}
+
+/* ═══ SEMANA ═══ */
+function getWeekDays(off){
+  const today = new Date(); const dow = today.getDay()||7;
+  const mon = new Date(today); mon.setDate(today.getDate()-dow+1+off*7);
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return dateToKey(d); });
+}
+
+function renderSemana(){
+  const days = getWeekDays(viewWeekOff);
+  const todayK = todayKey();
+  const DAY_LABELS = ['L','M','X','J','V','S','D'];
+  const totals = days.map(k=>dayTotal(currentMember.id,k));
+  const maxVal = Math.max(...totals,1);
+  const withData = totals.filter(v=>v>0);
+  const weekTotal = totals.reduce((a,b)=>a+b,0);
+  const avg = withData.length ? Math.round(weekTotal/withData.length) : 0;
+
+  let weekGridHtml = '';
+  days.forEach((k,i)=>{
+    const t=totals[i];
+    const pct = Math.round(t/maxVal*100);
+    const color = t===0?'var(--border)':t>currentMember.goal?'#E24B4A':t>currentMember.goal*.9?'#EF9F27':'#1D9E75';
+    weekGridHtml += `<div class="wday${k===todayK?' today':''}">
+      <span class="wd-name">${DAY_LABELS[i]}</span>
+      <div class="wd-bar-wrap"><div class="wd-fill" style="height:${pct}%;background:${color}"></div></div>
+      <span class="wd-val">${t>0?t.toLocaleString():'—'}</span>
+    </div>`;
+  });
+
+  let barsHtml = '';
+  days.forEach((k,i)=>{
+    const t=totals[i]; if(!t) return;
+    const pct = Math.min(100,Math.round(t/currentMember.goal*100));
+    const color = t>currentMember.goal?'#E24B4A':t>currentMember.goal*.9?'#EF9F27':'#1D9E75';
+    barsHtml += `<div class="bar-row">
+      <span class="bl">${fmtShort(k)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="bv">${t.toLocaleString()}</span>
+    </div>`;
+  });
+  if(!barsHtml) barsHtml = `<div class="empty-state">Sin datos esta semana.</div>`;
+
+  document.getElementById('tracker-content').innerHTML = `
+    <div class="date-nav">
+      <button class="nav-arrow" onclick="changeWeek(-1)">‹</button>
+      <span class="date-label">${fmtShort(days[0])} – ${fmtShort(days[6])}</span>
+      <button class="nav-arrow" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="val">${weekTotal.toLocaleString()}</div><div class="lbl">kcal esta semana</div></div>
+      <div class="metric"><div class="val">${avg.toLocaleString()}</div><div class="lbl">promedio diario</div></div>
+      <div class="metric"><div class="val">${withData.length}/7</div><div class="lbl">días con registros</div></div>
+    </div>
+    <div class="week-grid">${weekGridHtml}</div>
+    <div class="section-label">Detalle por día</div>
+    ${barsHtml}
+  `;
+}
+function changeWeek(d){ viewWeekOff+=d; renderSemana(); }
+
+/* ═══ MES ═══ */
+function getMonthDays(off){
+  const now=new Date(); const y=now.getFullYear(),m=now.getMonth()+off;
+  const last=new Date(y,m+1,0);
+  return Array.from({length:last.getDate()},(_,i)=>dateToKey(new Date(y,m,i+1)));
+}
+
+function renderMes(){
+  const now=new Date(); const tgt=new Date(now.getFullYear(),now.getMonth()+viewMonthOff,1);
+  const days=getMonthDays(viewMonthOff);
+  const totals=days.map(k=>({k,t:dayTotal(currentMember.id,k)}));
+  const withData=totals.filter(d=>d.t>0);
+  const monthTotal=totals.reduce((s,d)=>s+d.t,0);
+  const avg=withData.length?Math.round(monthTotal/withData.length):0;
+  const best=withData.length?withData.reduce((a,b)=>b.t>a.t?b:a):null;
+  const daysUnder=withData.filter(d=>d.t<=currentMember.goal).length;
+
+  // Weeks
+  const weeks=[]; let wk=[];
+  totals.forEach((d,i)=>{wk.push(d);if(wk.length===7||(i===totals.length-1)){weeks.push([...wk]);wk=[];}});
+  let wHtml='';
+  weeks.forEach((w,i)=>{
+    const wTotal=w.reduce((s,d)=>s+d.t,0);
+    if(!wTotal)return;
+    const wWithData=w.filter(d=>d.t>0);
+    const wAvg=wWithData.length?Math.round(wTotal/wWithData.length):0;
+    wHtml+=`<div class="mweek-row">
+      <div>
+        <div class="mw-label">Semana ${i+1}</div>
+        <div style="font-size:12px;color:var(--muted)">${fmtShort(w[0].k)} – ${fmtShort(w[w.length-1].k)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="mw-val">${wTotal.toLocaleString()} kcal</div>
+        <div class="mw-sub">prom ${wAvg.toLocaleString()}/día</div>
+      </div>
+    </div>`;
+  });
+  if(!wHtml) wHtml=`<div class="empty-state">Sin datos este mes.</div>`;
+
+  let bHtml='';
+  totals.forEach(({k,t})=>{
+    if(!t)return;
+    const pct=Math.min(100,Math.round(t/currentMember.goal*100));
+    const color=t>currentMember.goal?'#E24B4A':t>currentMember.goal*.9?'#EF9F27':'#1D9E75';
+    bHtml+=`<div class="bar-row">
+      <span class="bl">${fmtShort(k)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="bv">${t.toLocaleString()}</span>
+    </div>`;
+  });
+  if(!bHtml) bHtml=`<div class="empty-state">Sin registros este mes.</div>`;
+
+  document.getElementById('tracker-content').innerHTML = `
+    <div class="date-nav">
+      <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
+      <span class="date-label">${tgt.toLocaleDateString('es-MX',{month:'long',year:'numeric'})}</span>
+      <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="val">${monthTotal.toLocaleString()}</div><div class="lbl">kcal totales</div></div>
+      <div class="metric"><div class="val">${avg.toLocaleString()}</div><div class="lbl">promedio diario</div></div>
+      <div class="metric green"><div class="val">${daysUnder}</div><div class="lbl">días dentro de meta</div></div>
+    </div>
+    <div class="section-label">Por semana</div>
+    ${wHtml}
+    <div class="section-label">Progreso por día</div>
+    ${bHtml}
+  `;
+}
+function changeMonth(d){ viewMonthOff+=d; renderMes(); }
+
+/* ═══ PROFILE SETTINGS ═══ */
+function showProfileSettings(){
+  const m = currentMember;
+  let editEmoji = m.emoji, editColor = m.color;
+
+  const ePicker = EMOJIS.map(e=>`<div class="emoji-opt${e===m.emoji?' selected':''}" onclick="psPickEmoji('${e}')" data-e="${e}">${e}</div>`).join('');
+  const cPicker = COLORS.map(c=>`<div class="color-opt${c===m.color?' selected':''}" onclick="psPickColor('${c}')" data-c="${c}" style="background:${c}"></div>`).join('');
+
+  document.getElementById('profile-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:24px">
+      <div id="ps-avatar" class="avatar" style="width:72px;height:72px;font-size:32px;background:${m.color}20;color:${m.color};margin:0 auto 8px">${m.emoji}</div>
+      <p style="font-size:18px;font-weight:600">${m.name}</p>
+    </div>
+
+    <div class="settings-section">
+      <h3>Emoji</h3>
+      <div class="emoji-picker" id="ps-emoji-picker">${ePicker}</div>
+    </div>
+    <div class="settings-section">
+      <h3>Nombre</h3>
+      <div class="card-block" style="padding:0">
+        <div class="settings-row"><input type="text" id="ps-name" value="${m.name}" style="width:100%;text-align:left;font-size:16px"></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Color</h3>
+      <div class="color-picker" id="ps-color-picker">${cPicker}</div>
+    </div>
+    <div class="settings-section">
+      <h3>Meta diaria</h3>
+      <div class="card-block" style="padding:0">
+        <div class="settings-row">
+          <span class="sr-label">kcal / día</span>
+          <input type="number" id="ps-goal" value="${m.goal}" min="500" max="5000">
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveProfileSettings()" style="margin-bottom:12px">Guardar cambios</button>
+    <button class="btn-danger" onclick="deleteMember('${m.id}')">Eliminar perfil</button>
+  `;
+
+  window._psEmoji = m.emoji; window._psColor = m.color;
+  showScreen('screen-profile');
+}
+
+function psPickEmoji(e){
+  window._psEmoji = e;
+  document.querySelectorAll('#ps-emoji-picker .emoji-opt').forEach(el=>el.classList.toggle('selected',el.dataset.e===e));
+  const av=document.getElementById('ps-avatar'); if(av) av.textContent=e;
+}
+function psPickColor(c){
+  window._psColor = c;
+  document.querySelectorAll('#ps-color-picker .color-opt').forEach(el=>el.classList.toggle('selected',el.dataset.c===c));
+  const av=document.getElementById('ps-avatar');
+  if(av){ av.style.background=c+'20'; av.style.color=c; }
+}
+function saveProfileSettings(){
+  const name = document.getElementById('ps-name').value.trim();
+  const goal = parseInt(document.getElementById('ps-goal').value)||2000;
+  if(!name){ toast('Escribe un nombre'); return; }
+  const idx = members.findIndex(m=>m.id===currentMember.id);
+  members[idx] = {...members[idx], name, goal, emoji:window._psEmoji, color:window._psColor};
+  saveMembers();
+  saveMembersRemote(members[idx]);
+  currentMember = members[idx];
+  updateTrackerHeader();
+  toast('Perfil actualizado');
+  backToTracker();
+  renderTab();
+}
+function deleteMember(id){
+  if(!confirm('¿Eliminar este perfil y todos sus registros?')) return;
+  members = members.filter(m=>m.id!==id);
+  saveMembers();
+  localStorage.removeItem('fk-log-'+id);
+  deleteMemberRemote(id);
+  toast('Perfil eliminado');
+  goHome();
+}
+
+/* ═══ FOOD DB ═══ */
+const FOODS = [
+  // ── HUEVOS
+  {n:'Huevos revueltos (2)',p:'2 piezas',k:180},{n:'Huevos fritos (2)',p:'2 piezas',k:200},
+  {n:'Huevos a la mexicana',p:'2 huevos',k:220},{n:'Omelette',p:'2 huevos',k:250},
+  {n:'Huevo cocido',p:'1 pieza',k:78},{n:'Huevos divorciados',p:'2 huevos',k:260},
+  // ── DESAYUNOS TÍPICOS
+  {n:'Chilaquiles rojos',p:'1 plato',k:450},{n:'Chilaquiles verdes',p:'1 plato',k:420},
+  {n:'Hotcakes (2)',p:'2 piezas',k:350},{n:'Molletes',p:'2 piezas',k:380},
+  {n:'Tamales de rajas',p:'1 pieza',k:290},{n:'Tamales de pollo',p:'1 pieza',k:310},
+  {n:'Tamales de mole',p:'1 pieza',k:330},{n:'Tamales de elote',p:'1 pieza',k:250},
+  {n:'Enchiladas (3)',p:'3 piezas',k:450},{n:'Enfrijoladas (3)',p:'3 piezas',k:400},
+  {n:'Enmoladas (3)',p:'3 piezas',k:480},{n:'Tlayuda',p:'1 pieza',k:520},
+  // ── PAN Y CEREALES
+  {n:'Pan tostado',p:'1 rebanada',k:80},{n:'Pan blanco',p:'1 rebanada',k:70},
+  {n:'Pan integral',p:'1 rebanada',k:65},{n:'Pan dulce (concha)',p:'1 pieza',k:280},
+  {n:'Cuernito',p:'1 pieza',k:200},{n:'Donut',p:'1 pieza',k:300},
+  {n:'Avena con leche',p:'1 taza',k:280},{n:'Avena con agua',p:'1 taza',k:150},
+  {n:'Cereal con leche',p:'1 taza',k:250},{n:'Granola',p:'1/2 taza',k:300},
+  {n:'Waffles (2)',p:'2 piezas',k:320},
+  // ── ANTOJITOS
+  {n:'Taco de pollo',p:'1 taco',k:180},{n:'Taco de carne asada',p:'1 taco',k:210},
+  {n:'Taco de pastor',p:'1 taco',k:190},{n:'Taco de carnitas',p:'1 taco',k:220},
+  {n:'Taco de suadero',p:'1 taco',k:200},{n:'Taco de bistec',p:'1 taco',k:205},
+  {n:'Taco de frijoles',p:'1 taco',k:160},{n:'Taco de longaniza',p:'1 taco',k:230},
+  {n:'Taco de chorizo',p:'1 taco',k:240},{n:'Taco de rajas',p:'1 taco',k:170},
+  {n:'Taco dorado de pollo',p:'1 taco',k:200},{n:'Taco dorado de papa',p:'1 taco',k:180},
+  {n:'Quesadilla',p:'1 pieza',k:280},{n:'Quesadilla con pollo',p:'1 pieza',k:350},
+  {n:'Quesadilla con frijoles',p:'1 pieza',k:310},{n:'Sope',p:'1 pieza',k:250},
+  {n:'Gordita',p:'1 pieza',k:300},{n:'Tlacoyo',p:'1 pieza',k:280},
+  {n:'Huarache',p:'1 pieza',k:420},{n:'Memela',p:'1 pieza',k:260},
+  {n:'Tlacoyos de frijol',p:'1 pieza',k:270},{n:'Elote preparado',p:'1 pieza',k:350},
+  {n:'Esquite',p:'1 vaso',k:250},{n:'Tostada de pollo',p:'1 pieza',k:200},
+  {n:'Tostada de tinga',p:'1 pieza',k:220},{n:'Burrito',p:'1 pieza',k:380},
+  // ── TORTAS Y SANDWICHES
+  {n:'Torta de pollo',p:'1 pieza',k:450},{n:'Torta de jamón',p:'1 pieza',k:420},
+  {n:'Torta de milanesa',p:'1 pieza',k:520},{n:'Torta de pierna',p:'1 pieza',k:500},
+  {n:'Torta de pastor',p:'1 pieza',k:480},{n:'Sandwich de atún',p:'1 pieza',k:320},
+  {n:'Sandwich de jamón',p:'1 pieza',k:300},{n:'Cemita',p:'1 pieza',k:550},
+  // ── SOPAS Y CALDOS
+  {n:'Pozole rojo',p:'1 plato',k:380},{n:'Pozole verde',p:'1 plato',k:350},
+  {n:'Menudo',p:'1 plato',k:320},{n:'Birria',p:'1 plato',k:350},
+  {n:'Caldo de pollo',p:'1 plato',k:200},{n:'Consomé de pollo',p:'1 taza',k:120},
+  {n:'Sopa de verduras',p:'1 plato',k:150},{n:'Sopa de fideos',p:'1 plato',k:280},
+  {n:'Sopa de lima',p:'1 plato',k:250},{n:'Caldo de res',p:'1 plato',k:300},
+  {n:'Mole negro con pollo',p:'1 plato',k:480},{n:'Mole rojo',p:'1 plato',k:460},
+  // ── PROTEÍNAS
+  {n:'Pechuga de pollo a la plancha',p:'100g',k:165},{n:'Pierna de pollo',p:'1 pieza',k:220},
+  {n:'Muslo de pollo',p:'1 pieza',k:210},{n:'Milanesa de pollo',p:'1 pieza',k:280},
+  {n:'Milanesa de res',p:'1 pieza',k:320},{n:'Carne asada',p:'100g',k:250},
+  {n:'Bistec de res',p:'100g',k:270},{n:'Chuleta de cerdo',p:'1 pieza',k:290},
+  {n:'Costilla de cerdo',p:'100g',k:330},{n:'Lomo de cerdo',p:'100g',k:240},
+  {n:'Pescado a la plancha',p:'100g',k:180},{n:'Filete de pescado',p:'100g',k:170},
+  {n:'Atún en agua (lata)',p:'1 lata',k:130},{n:'Salmón',p:'100g',k:200},
+  {n:'Camarones',p:'100g',k:100},{n:'Pulpo',p:'100g',k:140},
+  {n:'Jamón de pavo',p:'2 rebanadas',k:80},{n:'Jamón de cerdo',p:'2 rebanadas',k:110},
+  {n:'Chorizo',p:'100g',k:380},{n:'Longaniza',p:'100g',k:360},
+  // ── CARBOHIDRATOS
+  {n:'Arroz blanco',p:'1 taza',k:200},{n:'Arroz a la mexicana',p:'1 taza',k:220},
+  {n:'Frijoles de olla',p:'1 taza',k:230},{n:'Frijoles refritos',p:'1 taza',k:280},
+  {n:'Tortilla de maíz',p:'1 pieza',k:52},{n:'Tortilla de harina',p:'1 pieza',k:100},
+  {n:'Papa cocida',p:'1 mediana',k:130},{n:'Papa al horno',p:'1 mediana',k:150},
+  {n:'Puré de papa',p:'1 taza',k:180},{n:'Pasta cocida',p:'1 taza',k:220},
+  {n:'Espagueti con salsa',p:'1 plato',k:350},{n:'Macarrones con queso',p:'1 taza',k:380},
+  // ── FRUTAS
+  {n:'Manzana',p:'1 mediana',k:80},{n:'Plátano',p:'1 mediana',k:90},
+  {n:'Naranja',p:'1 mediana',k:60},{n:'Mango',p:'1 taza',k:100},
+  {n:'Papaya',p:'1 taza',k:55},{n:'Sandía',p:'1 taza',k:50},
+  {n:'Melón',p:'1 taza',k:60},{n:'Pera',p:'1 mediana',k:100},
+  {n:'Uvas',p:'1 taza',k:104},{n:'Fresa',p:'1 taza',k:50},
+  {n:'Durazno',p:'1 mediana',k:60},{n:'Guayaba',p:'1 mediana',k:37},
+  {n:'Mandarina',p:'1 mediana',k:47},{n:'Piña',p:'1 taza',k:82},
+  {n:'Kiwi',p:'1 pieza',k:42},{n:'Lima',p:'1 pieza',k:20},
+  {n:'Coco rallado',p:'2 cdas',k:70},{n:'Ciruela',p:'1 mediana',k:46},
+  // ── VERDURAS
+  {n:'Ensalada verde',p:'1 plato',k:25},{n:'Ensalada césar',p:'1 plato',k:350},
+  {n:'Zanahoria',p:'1 mediana',k:50},{n:'Brócoli',p:'1 taza',k:55},
+  {n:'Espinaca',p:'1 taza',k:23},{n:'Chayote',p:'1 mediano',k:38},
+  {n:'Calabaza',p:'1 taza',k:30},{n:'Nopales',p:'1 taza',k:35},
+  {n:'Aguacate',p:'1/2 pieza',k:120},{n:'Jitomate',p:'1 mediano',k:35},
+  {n:'Elote',p:'1 mazorca',k:130},{n:'Ejotes',p:'1 taza',k:44},
+  {n:'Chile poblano',p:'1 pieza',k:30},{n:'Cebolla',p:'1/2 taza',k:32},
+  // ── LÁCTEOS
+  {n:'Leche entera',p:'1 vaso 250ml',k:150},{n:'Leche descremada',p:'1 vaso 250ml',k:90},
+  {n:'Leche light',p:'1 vaso 250ml',k:100},{n:'Yogurt natural',p:'1 taza',k:100},
+  {n:'Yogurt con fruta',p:'1 taza',k:150},{n:'Yogurt griego',p:'1 taza',k:130},
+  {n:'Queso fresco',p:'30g',k:75},{n:'Queso Oaxaca',p:'30g',k:110},
+  {n:'Queso panela',p:'30g',k:80},{n:'Queso amarillo',p:'1 rebanada',k:90},
+  {n:'Queso cottage',p:'1/2 taza',k:110},{n:'Crema',p:'2 cdas',k:60},
+  {n:'Jocoque',p:'1/2 taza',k:90},{n:'Mantequilla',p:'1 cda',k:100},
+  // ── BEBIDAS
+  {n:'Agua',p:'1 vaso',k:0},{n:'Café negro',p:'1 taza',k:5},
+  {n:'Café con leche',p:'1 taza',k:60},{n:'Café capuchino',p:'1 taza',k:120},
+  {n:'Café latte',p:'1 taza',k:190},{n:'Café frappé',p:'1 vaso',k:280},
+  {n:'Té sin azúcar',p:'1 taza',k:0},{n:'Té con azúcar',p:'1 taza',k:40},
+  {n:'Jugo de naranja',p:'1 vaso 250ml',k:110},{n:'Jugo verde',p:'1 vaso',k:100},
+  {n:'Agua de jamaica',p:'1 vaso',k:80},{n:'Agua de horchata',p:'1 vaso',k:150},
+  {n:'Agua de tamarindo',p:'1 vaso',k:120},{n:'Agua de limón',p:'1 vaso',k:50},
+  {n:'Licuado de plátano',p:'1 vaso',k:200},{n:'Licuado de fresa',p:'1 vaso',k:160},
+  {n:'Refresco',p:'355ml',k:150},{n:'Refresco light',p:'355ml',k:5},
+  {n:'Leche chocolatada',p:'1 vaso',k:200},{n:'Cerveza',p:'355ml',k:150},
+  {n:'Vino tinto',p:'1 copa',k:125},{n:'Michelada',p:'1 vaso',k:180},
+  // ── SNACKS
+  {n:'Nueces',p:'30g',k:180},{n:'Almendras',p:'30g',k:170},
+  {n:'Cacahuates',p:'30g',k:170},{n:'Pistaches',p:'30g',k:160},
+  {n:'Papas fritas (bolsa)',p:'bolsa chica',k:150},{n:'Doritos',p:'bolsa chica',k:140},
+  {n:'Galletas María (6)',p:'6 piezas',k:160},{n:'Galletas Oreo (3)',p:'3 piezas',k:160},
+  {n:'Chocolate',p:'30g',k:160},{n:'Palomitas naturales',p:'1 taza',k:100},
+  {n:'Palomitas con mantequilla',p:'1 taza',k:200},{n:'Gelatina',p:'1 porción',k:80},
+  {n:'Barrita Marinela',p:'1 pieza',k:120},{n:'Gansito',p:'1 pieza',k:230},
+  {n:'Submarino',p:'1 pieza',k:140},{n:'Mantecada',p:'1 pieza',k:190},
+  // ── COMIDA RÁPIDA
+  {n:'Pizza (rebanada)',p:'1 rebanada',k:280},{n:'Pizza entera (personal)',p:'1 pizza',k:700},
+  {n:'Hamburguesa',p:'1 pieza',k:450},{n:'Hamburguesa doble',p:'1 pieza',k:650},
+  {n:'Hot dog',p:'1 pieza',k:300},{n:'Hot dog preparado',p:'1 pieza',k:450},
+  {n:'Nuggets de pollo (6)',p:'6 piezas',k:280},{n:'Alitas de pollo (6)',p:'6 piezas',k:420},
+  {n:'Papas fritas (restaurante)',p:'porción mediana',k:320},{n:'Sushi (6 piezas)',p:'6 piezas',k:300},
+  {n:'Shawarma',p:'1 pieza',k:400},{n:'Kebab',p:'1 pieza',k:420},
+];
+
+/* ═══ AUTOCOMPLETE ═══ */
+let acIdx = -1;
+
+function acSearch(val) {
+  const list = document.getElementById('ac-list');
+  if (!list) return;
+  const q = val.trim().toLowerCase();
+  if (q.length < 2) { list.style.display = 'none'; return; }
+  const matches = FOODS.filter(f => f.n.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) {
+    list.innerHTML = `<div class="ac-empty">Sin resultados — ingresa las kcal manualmente</div>`;
+    list.style.display = 'block'; return;
+  }
+  list.innerHTML = matches.map((f, i) =>
+    `<div class="ac-item" data-i="${i}" onmousedown="acSelect(${FOODS.indexOf(f)})">
+      <span class="ac-name">${f.n}</span>
+      <span class="ac-portion">${f.p}</span>
+      <span class="ac-kcal">${f.k} kcal</span>
+    </div>`
+  ).join('');
+  list.style.display = 'block';
+  acIdx = -1;
+}
+
+function acSelect(idx) {
+  const f = FOODS[idx];
+  if (!f) return;
+  const inFood = document.getElementById('in-food');
+  const inCal = document.getElementById('in-cal');
+  if (inFood) inFood.value = f.n;
+  if (inCal) inCal.value = f.k;
+  acHide();
+  if (inCal) inCal.focus();
+}
+
+function acHide() {
+  const list = document.getElementById('ac-list');
+  if (list) list.style.display = 'none';
+}
+
+function acKeydown(e) {
+  const list = document.getElementById('ac-list');
+  if (!list || list.style.display === 'none') {
+    if (e.key === 'Enter') addEntry();
+    return;
+  }
+  const items = list.querySelectorAll('.ac-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); acIdx = Math.min(acIdx+1, items.length-1); acHighlight(items); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); acIdx = Math.max(acIdx-1, 0); acHighlight(items); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (acIdx >= 0 && items[acIdx]) items[acIdx].dispatchEvent(new Event('mousedown')); else addEntry(); }
+  else if (e.key === 'Escape') acHide();
+}
+
+function acHighlight(items) {
+  items.forEach((el, i) => el.style.background = i === acIdx ? 'var(--bg)' : '');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ac-wrap')) acHide();
+});
+
+/* ═══ SHEETS CONFIG UI ═══ */
+function showSheetsConfig() {
+  showScreen('screen-sheets');
+  const input = document.getElementById('sheets-url-input');
+  if (input) input.value = SCRIPT_URL;
+  updateSheetsStatusUI();
+}
+
+function updateSheetsStatusUI() {
+  const btn = document.getElementById('sync-all-btn');
+  const txt = document.getElementById('sheets-status-txt');
+  const homeSub = document.getElementById('home-subtitle');
+  const sheetsBtn = document.getElementById('sheets-btn');
+  if (SCRIPT_URL) {
+    if (txt) txt.innerHTML = '✅ <strong>Conectado</strong> — los datos se sincronizan con Google Sheets.';
+    if (btn) btn.disabled = false;
+    if (homeSub) homeSub.textContent = '☁️ Sincronizado con Google Sheets';
+    if (sheetsBtn) sheetsBtn.style.color = 'var(--green-light)';
+  } else {
+    if (txt) txt.textContent = 'Sin configurar — los datos solo se guardan localmente.';
+    if (btn) btn.disabled = true;
+    if (homeSub) homeSub.textContent = 'Selecciona tu perfil';
+    if (sheetsBtn) sheetsBtn.style.color = '';
+  }
+}
+
+async function saveSheetsUrl() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  if (!url) { toast('Pega la URL del Apps Script'); return; }
+  toast('Probando conexión…');
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({action: 'ping'})
+    });
+    const d = await res.json();
+    if (d.ok) {
+      SCRIPT_URL = url;
+      localStorage.setItem('fk-script-url', url);
+      updateSheetsStatusUI();
+      toast('✅ Conectado correctamente');
+    } else {
+      toast('Error: ' + (d.error || 'Respuesta inesperada'));
+    }
+  } catch(e) {
+    toast('No se pudo conectar. Verifica la URL y el despliegue.');
+  }
+}
+
+function clearSheetsUrl() {
+  if (!confirm('¿Desconectar Google Sheets? Los datos locales no se borran.')) return;
+  SCRIPT_URL = '';
+  localStorage.removeItem('fk-script-url');
+  updateSheetsStatusUI();
+  toast('Desconectado');
+}
+
+async function syncAllNow() {
+  if (!SCRIPT_URL) return;
+  const btn = document.getElementById('sync-all-btn');
+  if (btn) btn.textContent = '⟳ Sincronizando…';
+  showSyncBadge(true);
+
+  // Upload all local profiles to Sheets
+  for (const m of members) {
+    await saveMembersRemote(m);
+  }
+
+  // Upload all local logs to Sheets
+  for (const m of members) {
+    const log = getMemberLog(m.id);
+    for (const fecha of Object.keys(log)) {
+      for (const entry of (log[fecha]||[])) {
+        await saveLogRemote(m.id, entry, fecha);
+      }
+    }
+  }
+
+  showSyncBadge(false);
+  if (btn) btn.textContent = '↑↓ Sincronizar todo ahora';
+  toast('✅ Sincronización completa');
+}
+
+/* ═══ INIT ═══ */
+async function init() {
+  await loadMembers();
+  showHome();
+}
+init();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
